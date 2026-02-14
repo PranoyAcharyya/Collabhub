@@ -18,8 +18,9 @@ import { Menu, SquareMenu } from "lucide-react";
 
 const Navbar = () => {
   return (
-    <nav className="container z-10 flex items-center justify-between mx-auto px-5 py-3 bg-white-300 backdrop-blur-2xl fixed top-0 left-0">
-      <img src="/images/collabhub-bw.png" className="sitelogo"/>
+    <nav className="container max-w-full fixed top-0 left-0 z-10 bg-white-300 backdrop-blur-2xl">
+      <div className="flex container max-w-7xl items-center justify-between mx-auto px-5 py-3 ">
+          <img src="/images/collabhub-bw.png" className="sitelogo"/>
       <div className="hidden md:flex">
         <NavigationMenuDemo />
       </div>
@@ -44,6 +45,8 @@ const Navbar = () => {
         </Sheet>
         </div>
       </div>
+      </div>
+      
     </nav>
   );
 };
