@@ -1,4 +1,8 @@
 @import "tailwindcss";
+
+@plugin "tailwind-scrollbar-hide";
+
+/* @plugin "tailwind-scrollbar-hide"; */
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
@@ -75,6 +79,8 @@
     background-position: 0% 0%;}}
   --animate-marquee: marquee var(--duration) infinite linear;
   --animate-marquee-vertical: marquee-vertical var(--duration) linear infinite;
+  --color-brand: var(--brand);
+  --color-highlight: var(--highlight);
   @keyframes marquee {
   from {
     transform: translateX(0);}
@@ -119,6 +125,8 @@
   --sidebar-accent-foreground: oklch(0.21 0.006 285.885);
   --sidebar-border: oklch(0.92 0.004 286.32);
   --sidebar-ring: oklch(0.712 0.194 13.428);
+  --brand: oklch(0.623 0.214 259.815);
+  --highlight: oklch(0.852 0.199 91.936);
 }
 
 .dark {
@@ -153,6 +161,8 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.41 0.159 10.272);
+  --brand: oklch(0.707 0.165 254.624);
+  --highlight: oklch(0.852 0.199 91.936);
 }
 
 @layer base {
