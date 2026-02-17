@@ -5,6 +5,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import Navbar from "@/components/layouts/Navbar";
 import { Poppins } from "next/font/google";
 import Footer from "@/components/layouts/Footer";
+import QueryProvider from "@/providers/query-provider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -46,9 +47,11 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            {/* <Navbar /> */}
-            {children}
-            {/* <Footer/> */}
+           <QueryProvider>
+               {children}
+           </QueryProvider>
+           
+            
           </ThemeProvider>
         </body>
       </html>

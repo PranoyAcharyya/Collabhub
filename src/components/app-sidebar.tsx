@@ -1,67 +1,77 @@
-"use client"
+"use client";
 
-import * as React from "react"
+import * as React from "react";
 import {
   BookOpen,
-  GalleryVerticalEnd,
   Settings2,
   Users,
   Activity,
   CreditCard,
-} from "lucide-react"
+  GalleryVerticalEnd,
+} from "lucide-react";
 
-import { NavMain } from "@/components/nav-main"
-import { NavProjects } from "@/components/nav-projects"
-import { NavUser } from "@/components/nav-user"
-import { TeamSwitcher } from "@/components/team-switcher"
+import { useQuery } from "@tanstack/react-query";
+import { NavMain } from "@/components/nav-main";
+import { NavProjects } from "@/components/nav-projects";
+import { NavUser } from "@/components/nav-user";
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
   SidebarHeader,
   SidebarRail,
-} from "@/components/ui/sidebar"
+} from "@/components/ui/sidebar";
 
-// This is sample data.
-const data = {
-  user: {
-    name: "Pranoy Acharyya",
-    email: "pranoy@example.com",
-    avatar: "/avatars/user.jpg",
-  },
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
-  teams: [
+import { WorkspaceCreateForm } from "@/components/WorkspaceCreateForm";
+import { useWorkspaceStore } from "@/store/workspaceStore"
+
+
+async function fetchWorkspaces() {
+  const res = await fetch("/api/workspaces");
+  if (!res.ok) throw new Error("Failed to fetch");
+  return res.json();
+}
+
+export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const [open, setOpen] = React.useState(false);
+const { activeWorkspaceId, setActiveWorkspace } = useWorkspaceStore()
+
+  const { data } = useQuery({
+    queryKey: ["workspaces"],
+    queryFn: fetchWorkspaces,
+  });
+
+const workspaceItems =
+  data?.workspaces?.map((ws: any) => ({
+    title: ws.name,
+    onClick: () => setActiveWorkspace(ws.id),
+    isActive: activeWorkspaceId === ws.id,
+  })) || []
+
+  React.useEffect(() => {
+  if (!activeWorkspaceId && data?.workspaces?.length > 0) {
+    setActiveWorkspace(data.workspaces[0].id)
+  }
+}, [data, activeWorkspaceId, setActiveWorkspace])
+
+
+
+  const navMain = [
     {
-      name: "CollabHub Workspace",
-      logo: GalleryVerticalEnd,
-      plan: "Pro",
-    },
-  ],
-
-  navMain: [
-    {
-      title: "Documents",
-      url: "/dashboard",
-      icon: BookOpen,
+      title: "Workspaces",
+      url: "#",
+      icon: GalleryVerticalEnd,
       isActive: true,
-      items: [
-        {
-          title: "All Documents",
-          url: "/dashboard",
-        },
-        {
-          title: "Shared With Me",
-          url: "/dashboard/shared",
-        },
-        {
-          title: "Recent",
-          url: "/dashboard/recent",
-        },
-        {
-          title: "Trash",
-          url: "/dashboard/trash",
-        },
-      ],
+      items: workspaceItems,
     },
     {
       title: "Team",
@@ -83,9 +93,9 @@ const data = {
       url: "/dashboard/activity",
       icon: Activity,
     },
-  ],
+  ];
 
-  projects: [
+  const projects = [
     {
       name: "Billing",
       url: "/dashboard/billing",
@@ -96,24 +106,53 @@ const data = {
       url: "/dashboard/settings",
       icon: Settings2,
     },
-  ],
-}
+  ];
 
-
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
-        <TeamSwitcher teams={data.teams} />
+        {/* <h2 className="px-2 text-sm font-semibold">CollabHub</h2> */}
       </SidebarHeader>
+
       <SidebarContent>
-        <NavMain items={data.navMain} />
-        <NavProjects projects={data.projects} />
+        <NavMain items={navMain} />
+        {/* Create Workspace Dialog */}
+        <div className="px-3 mt-3">
+          <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger asChild>
+              <button 
+               onClick={() => setOpen(true)}
+              className="w-full text-sm border rounded-md py-2 hover:bg-muted transition">
+                + Create Workspace
+              </button>
+            </DialogTrigger>
+
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Create Workspace</DialogTitle>
+                <DialogDescription>
+                  Give your workspace a name to get started.
+                </DialogDescription>
+              </DialogHeader>
+
+              <WorkspaceCreateForm onSuccess={() => setOpen(false)}/>
+            </DialogContent>
+          </Dialog>
+        </div>
+        <NavProjects projects={projects} />
       </SidebarContent>
+
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser
+          user={{
+            name: "User",
+            email: "user@email.com",
+            avatar: "/avatars/user.jpg",
+          }}
+        />
       </SidebarFooter>
+
       <SidebarRail />
     </Sidebar>
-  )
+  );
 }
