@@ -1,4 +1,5 @@
 "use client";
+import { useState } from 'react';
 import { AnimatedShinyText } from "@/components/ui/animated-shiny-text";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -6,6 +7,7 @@ import { TextAnimate } from "@/components/ui/text-animate";
 import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ShineBorder } from "@/components/ui/shine-border";
+// import BlockEditor from '@/components/editor/BlockEditor';
 
 
 import {
@@ -21,7 +23,9 @@ import { ScrollVelocityRow,ScrollVelocityContainer } from "@/components/ui/scrol
 import { Marquee } from "@/components/ui/marquee";
 import ReviewCard from "@/components/ReviewCard";
 
+
 export default function Home() {
+    const [content, setContent] = useState();
   const features = [
     {
       title: "Real-Time Collaboration",
@@ -311,6 +315,7 @@ const secondRow = reviews.slice(reviews.length / 2)
       <div className="from-background pointer-events-none absolute inset-y-0 right-0 w-1/4 bg-gradient-to-l"></div>
     </div>
       </section>
+     
     </>
   );
 }

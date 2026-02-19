@@ -4,6 +4,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
+import BlockEditor from "@/components/editor/BlockEditor";
 
 async function fetchDocument(id: string) {
   const res = await fetch(`/api/documents/${id}`);
@@ -29,16 +30,19 @@ export default function DocumentPage() {
 
   // ---------------- CONTENT ----------------
   const [content, setContent] = useState("");
-  const [contentSaved, setContentSaved] = useState(true);
+ const [originalContent, setOriginalContent] = useState("");
 
-  useEffect(() => {
-    if (data?.document) {
-      setTitle(data.document.title || "");
-      setContent(data.document.content || "");
-      setTitleSaved(true);
-      setContentSaved(true);
-    }
-  }, [data]);
+
+useEffect(() => {
+  if (data?.document) {
+    setTitle(data.document.title || "");
+    const docContent = data.document.content || "";
+    setContent(docContent);
+    setOriginalContent(docContent);
+    setTitleSaved(true);
+  }
+}, [data]);
+
 
   // ---------------- UPDATE TITLE ----------------
   const updateTitle = useMutation({
@@ -62,21 +66,34 @@ export default function DocumentPage() {
   });
 
   // ---------------- SAVE CONTENT ----------------
-  const saveContent = useMutation({
-    mutationFn: async (newContent: string) => {
-      const res = await fetch(`/api/documents/${id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ content: newContent }),
-      });
+const saveContent = useMutation({
+  mutationFn: async (newContent: string) => {
+    const res = await fetch(`/api/documents/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ content: newContent }),
+    });
 
-      if (!res.ok) throw new Error("Failed to save content");
-      return res.json();
-    },
-    onSuccess: () => {
-      setContentSaved(true);
-    },
-  });
+    if (!res.ok) throw new Error("Failed to save content");
+    return res.json();
+  },
+  onSuccess: () => {
+    setOriginalContent(content);
+  },
+});
+
+useEffect(() => {
+  if (content === originalContent) return;
+
+  const timeout = setTimeout(() => {
+    if (!saveContent.isPending) {
+      saveContent.mutate(content);
+    }
+  }, 2000); // 2 sec debounce
+
+  return () => clearTimeout(timeout);
+}, [content]);
+
 
   function slugify(text: string) {
     return text
@@ -115,28 +132,33 @@ export default function DocumentPage() {
         {titleSaved ? "Title saved" : "Unsaved title changes"}
       </p>
 
-      {/* CONTENT EDITOR */}
-      <textarea
-        className="w-full min-h-[300px] border rounded-lg p-4 outline-none focus:ring-2 focus:ring-primary"
-        placeholder="Start writing..."
-        value={content}
-        onChange={(e) => {
-          setContent(e.target.value);
-          setContentSaved(false);
-        }}
-      />
-
+      {/* BLOCK EDITOR */}
+      
+        <BlockEditor
+          value={content}
+          onChange={(val: string) => {
+            setContent(val);
+            setContentSaved(false);
+          }}
+        />
+ 
       <div className="mt-4 flex items-center justify-between">
-        <p className="text-xs text-muted-foreground">
-          {contentSaved ? "Content saved" : "Unsaved content changes"}
-        </p>
+      <p className="text-xs text-muted-foreground">
+  {content === originalContent
+    ? "All changes saved"
+    : saveContent.isPending
+    ? "Saving..."
+    : "Unsaved changes"}
+</p>
 
-        <Button
-          disabled={contentSaved || saveContent.isPending}
-          onClick={() => saveContent.mutate(content)}
-        >
-          {saveContent.isPending ? "Saving..." : "Save Content"}
-        </Button>
+
+      <Button
+  disabled={content === originalContent || saveContent.isPending}
+  onClick={() => saveContent.mutate(content)}
+>
+  {saveContent.isPending ? "Saving..." : "Save Content"}
+</Button>
+
       </div>
     </div>
   );
