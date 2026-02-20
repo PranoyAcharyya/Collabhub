@@ -15,6 +15,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Menu, SquareMenu } from "lucide-react";
+import { AnimatedThemeToggler } from "@/components/ui/animated-theme-toggler";
 
 const Navbar = () => {
   return (
@@ -28,7 +29,8 @@ const Navbar = () => {
         <Button variant="outline" className="hidden md:block">
           Login
         </Button>
-        <ModeToggle />
+        {/* <ModeToggle /> */}
+        <AnimatedThemeToggler/>
         <div className="block md:hidden">
           <Sheet>
           <SheetTrigger>
