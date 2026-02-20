@@ -139,16 +139,26 @@ const secondRow = reviews.slice(reviews.length / 2)
       </AnimatedShinyText>
     </div>
 
-    <TextAnimate
-      as="h1"
-      animation="blurInUp"
-      by="word"
-      once
-      className="text-2xl md:text-5xl lg:text-[75px] text-center font-bold max-w-[80%]"
-    >
-      Your team’s all-in-one workspace
-    </TextAnimate>
-       <TextAnimate animation="blurInUp" by="character" once>
+   <TextAnimate
+  as="h1"
+  animation="blurInUp"
+  by="word"
+  once
+  className="
+    text-2xl 
+    md:text-5xl 
+    lg:text-[75px] 
+    leading-[1.05] 
+    text-center 
+    font-bold 
+    max-w-[80%] 
+    mx-auto
+   dark:mix-blend-difference
+  "
+>
+  Your team’s all-in-one workspace
+</TextAnimate>
+       <TextAnimate className='dark:mix-blend-difference' animation="blurInUp" by="character" once>
       Manage projects, collaborate in real-time, and keep everything in one place.
     </TextAnimate>
     <motion.div
