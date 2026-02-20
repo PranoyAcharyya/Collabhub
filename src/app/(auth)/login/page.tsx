@@ -9,8 +9,9 @@ import { Button } from "@/components/ui/button";
 import { HyperText } from "@/components/ui/hyper-text";
 import { Card } from "@/components/ui/card";
 import { ShineBorder } from "@/components/ui/shine-border";
-import { useRouter } from 'next/navigation'
-import { AnimatedThemeToggler } from "@/components/ui/animated-theme-toggler"
+import { useRouter } from "next/navigation";
+import { AnimatedThemeToggler } from "@/components/ui/animated-theme-toggler";
+import { signInWithGoogle } from "@/app/(auth)/actions";
 
 const schema = yup.object({
   email: yup.string().email("Invalid email").required("Email is required"),
@@ -25,7 +26,18 @@ type LoginForm = yup.InferType<typeof schema>;
 export default function LoginPage() {
   const supabase = createClient();
   const [loading, setLoading] = useState(false);
-    const router = useRouter()
+  const router = useRouter();
+
+  const handleGoogleLogin = async () => {
+    try {
+      const url = await signInWithGoogle();
+      if (url) {
+        window.location.href = url;
+      }
+    } catch (err: any) {
+      alert(err.message);
+    }
+  };
 
   const {
     register,
@@ -55,18 +67,23 @@ export default function LoginPage() {
   return (
     <div className="flex min-h-screen w-full">
       <div className="w-[50%] hidden md:block login-left"></div>
-      <div className="w-[100%] md:w-[50%]  p-5 flex justify-center items-center col relative">
+
+      <div className="w-[100%] md:w-[50%] p-5 flex justify-center items-center col relative">
         <div className="absolute top-[20px] right-[20px]">
           <AnimatedThemeToggler />
         </div>
+
         <Card className="relative w-full max-w-[350px] overflow-hidden p-5 flex col items-center justify-center">
-           <ShineBorder shineColor={["#A07CFE", "#FE8FB5", "#FFBE7B"]} />
-           <img
-          src="/images/logo.png"
-          className="self-center w-12 mb-1 sitelogo"
-          alt="CollabHub Logo"
-        />
+          <ShineBorder shineColor={["#A07CFE", "#FE8FB5", "#FFBE7B"]} />
+
+          <img
+            src="/images/logo.png"
+            className="self-center w-12 mb-1 sitelogo"
+            alt="CollabHub Logo"
+          />
+
           <HyperText>Login</HyperText>
+
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 w-80">
             <div>
               <input
@@ -74,7 +91,9 @@ export default function LoginPage() {
                 {...register("email")}
                 className="border p-2 w-full"
               />
-              <p className="text-red-500 text-sm">{errors.email?.message}</p>
+              <p className="text-red-500 text-sm">
+                {errors.email?.message}
+              </p>
             </div>
 
             <div>
@@ -84,14 +103,28 @@ export default function LoginPage() {
                 {...register("password")}
                 className="border p-2 w-full"
               />
-              <p className="text-red-500 text-sm">{errors.password?.message}</p>
+              <p className="text-red-500 text-sm">
+                {errors.password?.message}
+              </p>
             </div>
 
             <Button type="submit" disabled={loading} className="p-2 w-full">
               {loading ? "Logging in..." : "Login"}
             </Button>
+
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full"
+              onClick={handleGoogleLogin}
+            >
+              Continue with Google
+            </Button>
           </form>
-          <Button onClick={() => router.push('/signup')}>Not registered yet? Signup here</Button>
+
+          <Button onClick={() => router.push("/signup")}>
+            Not registered yet? Signup here
+          </Button>
         </Card>
       </div>
     </div>

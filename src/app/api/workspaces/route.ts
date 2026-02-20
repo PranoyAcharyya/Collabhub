@@ -15,11 +15,11 @@ export async function POST(request: Request) {
         },
         setAll(cookiesToSet) {
           cookiesToSet.forEach(({ name, value, options }) =>
-            cookieStore.set(name, value, options)
+            cookieStore.set(name, value, options),
           );
         },
       },
-    }
+    },
   );
 
   const {
@@ -51,7 +51,7 @@ export async function POST(request: Request) {
   if (workspaceError || !workspace) {
     return NextResponse.json(
       { error: workspaceError?.message || "Workspace create failed" },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -65,14 +65,12 @@ export async function POST(request: Request) {
     });
 
   if (memberError) {
-  console.log("Member insert error:", memberError);
-  return NextResponse.json({ error: memberError.message }, { status: 400 });
-}
+    console.log("Member insert error:", memberError);
+    return NextResponse.json({ error: memberError.message }, { status: 400 });
+  }
 
   return NextResponse.json({ success: true });
 }
-
-
 
 export async function GET() {
   const cookieStore = await cookies();
@@ -102,14 +100,21 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  // 🔥 Join workspace_members
   const { data, error } = await supabase
-    .from("workspaces")
-    .select("*")
-    .eq("owner_id", user.id);
+    .from("workspace_members")
+    .select(`
+      role,
+      workspaces (*)
+    `)
+    .eq("user_id", user.id);
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 400 });
   }
 
-  return NextResponse.json({ workspaces: data });
+  // Extract workspaces array
+  const workspaces = data.map((item) => item.workspaces);
+
+  return NextResponse.json({ workspaces });
 }

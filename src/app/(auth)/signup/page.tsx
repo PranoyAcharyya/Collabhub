@@ -9,8 +9,9 @@ import { Button } from "@/components/ui/button";
 import { HyperText } from "@/components/ui/hyper-text";
 import { Card } from "@/components/ui/card";
 import { ShineBorder } from "@/components/ui/shine-border";
-import { useRouter } from 'next/navigation'
+import { useRouter } from "next/navigation";
 import { AnimatedThemeToggler } from "@/components/ui/animated-theme-toggler";
+import { signInWithGoogle } from "@/app/(auth)/actions";
 
 const schema = yup.object({
   fullName: yup.string().required("Full name is required"),
@@ -31,7 +32,18 @@ type FormData = yup.InferType<typeof schema>;
 const SignupPage = () => {
   const supabase = createClient();
   const [loading, setLoading] = useState(false);
-  const router = useRouter()
+  const router = useRouter();
+
+  const handleGoogleLogin = async () => {
+    try {
+      const url = await signInWithGoogle();
+      if (url) {
+        window.location.href = url;
+      }
+    } catch (err: any) {
+      alert(err.message);
+    }
+  };
 
   const {
     register,
@@ -44,9 +56,15 @@ const SignupPage = () => {
   const onSubmit = async (formData: FormData) => {
     setLoading(true);
 
-    const { data: signUpData, error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email: formData.email,
       password: formData.password,
+      options: {
+        data: {
+          full_name: formData.fullName,
+          phone: formData.phone,
+        },
+      },
     });
 
     if (error) {
@@ -55,22 +73,11 @@ const SignupPage = () => {
       return;
     }
 
-    const userId = signUpData.user?.id;
-
-    if (userId) {
-      const { error: profileError } = await supabase
-        .from("profiles")
-        .update({
-          full_name: formData.fullName,
-          phone: formData.phone,
-        })
-        .eq("id", userId);
-
-      if (profileError) {
-        alert(profileError.message);
-        setLoading(false);
-        return;
-      }
+    // If email confirmation enabled → user will need to confirm first
+    if (!data.session) {
+      alert("Check your email to confirm your account.");
+      setLoading(false);
+      return;
     }
 
     window.location.href = "/dashboard";
@@ -78,27 +85,25 @@ const SignupPage = () => {
 
   return (
     <div className="flex flex-row-reverse min-h-screen w-full">
-      {/* Left Side */}
       <div className="w-[50%] hidden md:block login-right"></div>
 
-      {/* Right Side */}
       <div className="w-[100%] md:w-[50%] p-5 flex justify-center items-center col relative">
         <div className="absolute top-[20px] left-[20px]">
-                  <AnimatedThemeToggler />
-                </div>
+          <AnimatedThemeToggler />
+        </div>
+
         <Card className="relative w-full max-w-[400px] overflow-hidden p-6 flex col items-center justify-center">
           <ShineBorder shineColor={["#A07CFE", "#FE8FB5", "#FFBE7B"]} />
-         <img
-          src="/images/logo.png"
-          className="self-center w-12 mb-1 sitelogo"
-          alt="CollabHub Logo"
-        />
+
+          <img
+            src="/images/logo.png"
+            className="self-center w-12 mb-1 sitelogo"
+            alt="CollabHub Logo"
+          />
+
           <HyperText>Sign Up</HyperText>
 
-          <form
-            onSubmit={handleSubmit(onSubmit)}
-            className="space-y-4 w-80"
-          >
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 w-80">
             <div>
               <input
                 placeholder="Full Name"
@@ -156,15 +161,23 @@ const SignupPage = () => {
               </p>
             </div>
 
-            <Button
-              type="submit"
-              disabled={loading}
-              className="p-2 w-full"
-            >
+            <Button type="submit" disabled={loading} className="p-2 w-full">
               {loading ? "Signing up..." : "Sign Up"}
             </Button>
+
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full"
+              onClick={handleGoogleLogin}
+            >
+              Continue with Google
+            </Button>
           </form>
-          <Button onClick={() => router.push('/login')}>Already registered? Login here</Button>
+
+          <Button onClick={() => router.push("/login")}>
+            Already registered? Login here
+          </Button>
         </Card>
       </div>
     </div>

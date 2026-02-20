@@ -34,6 +34,14 @@ import {
 import { WorkspaceCreateForm } from "@/components/WorkspaceCreateForm";
 import { useWorkspaceStore } from "@/store/workspaceStore"
 
+interface AppSidebarProps
+  extends React.ComponentProps<typeof Sidebar> {
+  user: {
+    name: string;
+    email: string;
+    avatar: string;
+  };
+}
 
 async function fetchWorkspaces() {
   const res = await fetch("/api/workspaces");
@@ -41,7 +49,7 @@ async function fetchWorkspaces() {
   return res.json();
 }
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+export function AppSidebar({ user, ...props }: AppSidebarProps) {
   const [open, setOpen] = React.useState(false);
 const { activeWorkspaceId, setActiveWorkspace } = useWorkspaceStore()
 
@@ -143,13 +151,7 @@ const workspaceItems =
       </SidebarContent>
 
       <SidebarFooter>
-        <NavUser
-          user={{
-            name: "User",
-            email: "user@email.com",
-            avatar: "/avatars/user.jpg",
-          }}
-        />
+        <NavUser user={user} />
       </SidebarFooter>
 
       <SidebarRail />

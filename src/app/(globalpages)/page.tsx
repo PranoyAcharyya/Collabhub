@@ -22,6 +22,7 @@ import {
 import { ScrollVelocityRow,ScrollVelocityContainer } from "@/components/ui/scroll-based-velocity";
 import { Marquee } from "@/components/ui/marquee";
 import ReviewCard from "@/components/ReviewCard";
+import { InteractiveHoverButton } from '@/components/ui/interactive-hover-button';
 
 
 export default function Home() {
@@ -315,7 +316,35 @@ const secondRow = reviews.slice(reviews.length / 2)
       <div className="from-background pointer-events-none absolute inset-y-0 right-0 w-1/4 bg-gradient-to-l"></div>
     </div>
       </section>
-     
+     <section className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-28 lg:py-36">
+  <div
+    className=" cta 
+      min-h-[260px] sm:min-h-[300px] 
+      flex flex-col items-center justify-center 
+      text-center gap-4 sm:gap-6
+      rounded-3xl sm:rounded-[50px]
+      px-6 sm:px-12 py-12
+      bg-[linear-gradient(135deg,_rgb(124,58,237),_rgba(24,47,255,0.6))]
+      bg-[length:200%_200%]
+      bg-[position:0%_0%]
+      dark:bg-[linear-gradient(135deg,_rgb(244,63,94),_rgba(251,113,133,0.8))]
+    "
+  >
+    <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white leading-tight">
+      Try Collabhub free
+    </h2>
+
+    <p className="text-base sm:text-lg lg:text-2xl text-white/90 max-w-2xl">
+      Start with a focused trial to explore the workspace
+    </p>
+
+    <div className="mt-2 sm:mt-4">
+      <InteractiveHoverButton>
+        Hurry 14 days free trial
+      </InteractiveHoverButton>
+    </div>
+  </div>
+</section>
     </>
   );
 }

@@ -204,3 +204,28 @@ filter: invert(1) brightness(1.2);
 ::view-transition-old(root), ::view-transition-new(root) {
     animation: none;
     mix-blend-mode: normal;}
+
+
+    .cta{
+      position: relative;
+      z-index: 1;
+      overflow: hidden;
+    }
+
+
+    .cta::before{
+      content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url("https://www.reactbits.dev/assets/demo/grain.webp");
+    filter: brightness(3);
+    background-size: 500px 500px;
+    mix-blend-mode: lighten;
+    background-repeat: repeat;
+    opacity: 1;
+    pointer-events: none;
+    z-index: -1;
+    }

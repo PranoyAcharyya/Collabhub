@@ -1,51 +1,80 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 
+// ================= POST =================
 export async function POST(
   request: Request,
-  { params }: { params: Promise<{ id: string }> }
+  context: { params: Promise<{ id: string }> }
 ) {
-  const { id: workspaceId } = await params;
+  const { id: workspaceId } = await context.params;
   const supabase = await createClient();
 
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
+  console.log("Logged in user ID:", user?.id);
+  console.log("Workspace ID:", workspaceId);
+
   if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   const { email, role } = await request.json();
+  const cleanEmail = email?.trim().toLowerCase();
 
-  if (!email) {
+  console.log("Email trying to add:", cleanEmail);
+
+  if (!cleanEmail) {
     return NextResponse.json({ error: "Email required" }, { status: 400 });
   }
 
-  // 1️⃣ Check if current user is admin
+  // ✅ Check admin
   const { data: currentMember } = await supabase
     .from("workspace_members")
     .select("role")
     .eq("workspace_id", workspaceId)
     .eq("user_id", user.id)
-    .single();
+    .maybeSingle();
 
   if (!currentMember || currentMember.role !== "admin") {
     return NextResponse.json({ error: "Not authorized" }, { status: 403 });
   }
 
-  // 2️⃣ Find user by email
-  const { data: targetUser } = await supabase
+  // ✅ Find user in profiles (case-insensitive)
+  const { data: targetUser, error: profileError } = await supabase
     .from("profiles")
     .select("id")
-    .eq("email", email)
-    .single();
+    .ilike("email", cleanEmail)
+    .maybeSingle();
 
-  if (!targetUser) {
-    return NextResponse.json({ error: "User not found" }, { status: 404 });
+  if (profileError) {
+    console.log("Profile lookup error:", profileError);
   }
 
-  // 3️⃣ Insert member
+  if (!targetUser) {
+    return NextResponse.json(
+      { error: "User has not signed up yet." },
+      { status: 400 }
+    );
+  }
+
+  // ✅ Prevent duplicate insert
+  const { data: existingMember } = await supabase
+    .from("workspace_members")
+    .select("id")
+    .eq("workspace_id", workspaceId)
+    .eq("user_id", targetUser.id)
+    .maybeSingle();
+
+  if (existingMember) {
+    return NextResponse.json(
+      { error: "User already a member." },
+      { status: 400 }
+    );
+  }
+
+  // ✅ Insert member
   const { error } = await supabase
     .from("workspace_members")
     .insert({
@@ -55,6 +84,7 @@ export async function POST(
     });
 
   if (error) {
+    console.log("Insert error:", error);
     return NextResponse.json({ error: error.message }, { status: 400 });
   }
 
@@ -62,11 +92,12 @@ export async function POST(
 }
 
 
+// ================= GET =================
 export async function GET(
   request: Request,
-  { params }: { params: Promise<{ id: string }> }
+  context: { params: Promise<{ id: string }> }
 ) {
-  const { id: workspaceId } = await params;
+  const { id: workspaceId } = await context.params;
   const supabase = await createClient();
 
   const { data, error } = await supabase
@@ -89,11 +120,12 @@ export async function GET(
 }
 
 
+// ================= DELETE =================
 export async function DELETE(
   request: Request,
-  { params }: { params: Promise<{ id: string }> }
+  context: { params: Promise<{ id: string }> }
 ) {
-  const { id: workspaceId } = await params;
+  const { id: workspaceId } = await context.params;
   const supabase = await createClient();
 
   const { memberId } = await request.json();
