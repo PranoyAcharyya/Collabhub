@@ -90,7 +90,13 @@
   from {
     transform: translateY(0);}
   to {
-    transform: translateY(calc(-100% - var(--gap)));}}}
+    transform: translateY(calc(-100% - var(--gap)));}}
+  --animate-grid: grid 15s linear infinite;
+  @keyframes grid {
+  0% {
+    transform: translateY(-50%);}
+  100% {
+    transform: translateY(0);}}}
 
 :root {
   --radius: 0.65rem;
@@ -205,13 +211,11 @@ filter: invert(1) brightness(1.2);
     animation: none;
     mix-blend-mode: normal;}
 
-
     .cta{
       position: relative;
       z-index: 1;
       overflow: hidden;
     }
-
 
     .cta::before{
       content: "";

@@ -7,7 +7,8 @@ import { TextAnimate } from "@/components/ui/text-animate";
 import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ShineBorder } from "@/components/ui/shine-border";
-// import BlockEditor from '@/components/editor/BlockEditor';
+import { RetroGrid } from "@/components/ui/retro-grid"
+import { Globe } from "@/components/ui/globe"
 
 
 import {
@@ -122,8 +123,8 @@ const secondRow = reviews.slice(reviews.length / 2)
     <>
      <section className="min-h-screen px-5 flex flex-col justify-center items-center gap-5 relative overflow-hidden">
 
-
-
+     {/* <RetroGrid /> */}
+<Globe className="top-20" />
 
   {/* Content */}
   <div className="relative flex flex-col items-center gap-5">
@@ -145,16 +146,18 @@ const secondRow = reviews.slice(reviews.length / 2)
       once
       className="text-2xl md:text-5xl lg:text-[75px] text-center font-bold max-w-[80%]"
     >
-      All in one collaboration and productivity platform
+      Your team’s all-in-one workspace
     </TextAnimate>
-
+       <TextAnimate animation="blurInUp" by="character" once>
+      Manage projects, collaborate in real-time, and keep everything in one place.
+    </TextAnimate>
     <motion.div
       initial={{ opacity: 0, y: 40 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, ease: "easeOut" }}
     >
       <Button className="px-14 py-7 text-xl mt-4">
-        Try free
+        Start building for free
       </Button>
     </motion.div>
 
