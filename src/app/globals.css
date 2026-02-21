@@ -236,3 +236,16 @@ filter: invert(1) brightness(1.2);
 
 
    
+
+
+    html, body {
+  height: auto;
+}
+
+html.lenis {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}

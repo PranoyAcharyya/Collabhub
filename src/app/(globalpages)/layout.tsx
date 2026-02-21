@@ -1,5 +1,6 @@
 import Navbar from "@/components/layouts/Navbar";
 import Footer from "@/components/layouts/Footer";
+import SmoothScrollProvider from "@/components/providers/smooth-scroll-provider";
 
 export default function GlobalLayout({
   children,
@@ -8,9 +9,12 @@ export default function GlobalLayout({
 }) {
   return (
     <>
-      <Navbar />
+    <SmoothScrollProvider>
+         <Navbar />
       {children}
       <Footer />
+    </SmoothScrollProvider>
+     
     </>
   );
 }
