@@ -1,5 +1,6 @@
 "use client";
 
+import { createClient } from "@/lib/supabase/client";
 import { useParams, useRouter } from "next/navigation";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState, useEffect } from "react";
@@ -13,10 +14,19 @@ async function fetchDocument(id: string) {
 }
 
 export default function DocumentPage() {
+  const supabase = createClient();
+
   const params = useParams();
   const router = useRouter();
   const id = params.id as string;
   const queryClient = useQueryClient();
+
+  const [content, setContent] = useState("");
+  const [originalContent, setOriginalContent] = useState("");
+  const [activeUsers, setActiveUsers] = useState<string[]>([]);
+  const [title, setTitle] = useState("");
+  const [titleSaved, setTitleSaved] = useState(true);
+  const [currentUser, setCurrentUser] = useState<string>("Anonymous");
 
   const { data, isLoading } = useQuery({
     queryKey: ["document", id],
@@ -24,25 +34,58 @@ export default function DocumentPage() {
     enabled: !!id,
   });
 
-  // ---------------- TITLE ----------------
-  const [title, setTitle] = useState("");
-  const [titleSaved, setTitleSaved] = useState(true);
+  // 🔥 Get logged-in user
+  useEffect(() => {
+    async function getUser() {
+      const { data } = await supabase.auth.getUser();
 
-  // ---------------- CONTENT ----------------
-  const [content, setContent] = useState("");
- const [originalContent, setOriginalContent] = useState("");
+      setCurrentUser(
+        data.user?.user_metadata?.full_name ||
+        data.user?.email ||
+        "Anonymous"
+      );
+    }
 
+    getUser();
+  }, [supabase]);
 
+  // Set title from document
+  useEffect(() => {
+    if (data?.document) {
+      setTitle(data.document.title || "");
+      setTitleSaved(true);
+    }
+  }, [data]);
+
+  // ---------------- SAVE CONTENT ----------------
+  const saveContent = useMutation({
+    mutationFn: async (newContent: string) => {
+      const res = await fetch(`/api/documents/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ content: newContent }),
+      });
+
+      if (!res.ok) throw new Error("Failed to save content");
+      return res.json();
+    },
+    onSuccess: () => {
+      setOriginalContent(content);
+    },
+  });
+
+  // Debounce save
 useEffect(() => {
-  if (data?.document) {
-    setTitle(data.document.title || "");
-    const docContent = data.document.content || "";
-    setContent(docContent);
-    setOriginalContent(docContent);
-    setTitleSaved(true);
-  }
-}, [data]);
+  if (content === originalContent) return;
 
+  const timeout = setTimeout(() => {
+    if (!saveContent.isPending) {
+      saveContent.mutate(content);
+    }
+  }, 2000);
+
+  return () => clearTimeout(timeout);
+}, [content]);
 
   // ---------------- UPDATE TITLE ----------------
   const updateTitle = useMutation({
@@ -64,36 +107,6 @@ useEffect(() => {
       router.replace(`/dashboard/document/${updated.document.id}/${slug}`);
     },
   });
-
-  // ---------------- SAVE CONTENT ----------------
-const saveContent = useMutation({
-  mutationFn: async (newContent: string) => {
-    const res = await fetch(`/api/documents/${id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ content: newContent }),
-    });
-
-    if (!res.ok) throw new Error("Failed to save content");
-    return res.json();
-  },
-  onSuccess: () => {
-    setOriginalContent(content);
-  },
-});
-
-useEffect(() => {
-  if (content === originalContent) return;
-
-  const timeout = setTimeout(() => {
-    if (!saveContent.isPending) {
-      saveContent.mutate(content);
-    }
-  }, 2000); // 2 sec debounce
-
-  return () => clearTimeout(timeout);
-}, [content]);
-
 
   function slugify(text: string) {
     return text
@@ -133,33 +146,26 @@ useEffect(() => {
       </p>
 
       {/* BLOCK EDITOR */}
-      
-        <BlockEditor
-          value={content}
-          onChange={(val: string) => {
-            setContent(val);
-            setContentSaved(false);
-          }}
-        />
- 
-      <div className="mt-4 flex items-center justify-between">
-      <p className="text-xs text-muted-foreground">
-  {content === originalContent
-    ? "All changes saved"
-    : saveContent.isPending
-    ? "Saving..."
-    : "Unsaved changes"}
-</p>
+      <BlockEditor
+        documentId={id}
+        userName={currentUser}
+        onYDocChange={(val) => setContent(val)}
+        onPresenceChange={(users) => setActiveUsers(users)}
+      />
 
-
-      <Button
-  disabled={content === originalContent || saveContent.isPending}
-  onClick={() => saveContent.mutate(content)}
->
-  {saveContent.isPending ? "Saving..." : "Save Content"}
-</Button>
-
+      {/* STATUS */}
+      <div className="mt-4">
+        <p className="text-xs text-muted-foreground">
+          {activeUsers.length > 1
+            ? `Editing: ${activeUsers.join(", ")}`
+            : content === originalContent
+            ? "All changes saved"
+            : saveContent.isPending
+            ? "Saving..."
+            : "Unsaved changes"}
+        </p>
       </div>
+
     </div>
   );
 }

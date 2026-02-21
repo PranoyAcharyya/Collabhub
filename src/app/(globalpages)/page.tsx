@@ -158,7 +158,7 @@ const secondRow = reviews.slice(reviews.length / 2)
 >
   Your team’s all-in-one workspace
 </TextAnimate>
-       <TextAnimate className='dark:mix-blend-difference' animation="blurInUp" by="character" once>
+       <TextAnimate className='dark:mix-blend-difference text-center' animation="blurInUp" by="character" once>
       Manage projects, collaborate in real-time, and keep everything in one place.
     </TextAnimate>
     <motion.div

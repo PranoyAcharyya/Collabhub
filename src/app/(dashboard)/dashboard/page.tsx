@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { AlertCircleIcon } from "lucide-react"
+import { AlertCircleIcon } from "lucide-react";
 
 async function fetchDocuments(workspaceId: string) {
   const res = await fetch(`/api/documents?workspaceId=${workspaceId}`);
@@ -37,7 +37,6 @@ export default function DashboardPage() {
   const [email, setEmail] = useState("");
   const [role, setRole] = useState("member");
   const [memberError, setMemberError] = useState<string | null>(null);
-
 
   // ---------------- CREATE DOCUMENT ----------------
   const createDocument = useMutation({
@@ -77,21 +76,80 @@ export default function DashboardPage() {
     enabled: !!activeWorkspaceId,
   });
 
-const addMember = useMutation({
-  mutationFn: async () => {
-    const res = await fetch(
-      `/api/workspaces/${activeWorkspaceId}/members`,
-      {
+  // ---------------- ADD MEMBER ----------------
+  const addMember = useMutation({
+    mutationFn: async () => {
+      const res = await fetch(`/api/workspaces/${activeWorkspaceId}/members`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, role }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "Something went wrong");
+      }
+
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["members", activeWorkspaceId],
+      });
+      setEmail("");
+      setMemberError(null);
+    },
+    onError: (error: any) => {
+      setMemberError(error.message);
+    },
+  });
+
+  // ---------------- REMOVE MEMBER ----------------
+  const removeMember = useMutation({
+    mutationFn: async (memberId: string) => {
+      const res = await fetch(
+        `/api/workspaces/${activeWorkspaceId}/members/${memberId}`,
+        { method: "DELETE" }
+      );
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to remove");
+      }
+
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["members", activeWorkspaceId],
+      });
+    },
+  });
+
+
+  const updateRole = useMutation({
+  mutationFn: async ({
+    memberId,
+    role,
+  }: {
+    memberId: string;
+    role: string;
+  }) => {
+    const res = await fetch(
+      `/api/workspaces/${activeWorkspaceId}/members/${memberId}`,
+      {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ role }),
       }
     );
 
     const data = await res.json();
 
     if (!res.ok) {
-      throw new Error(data.error || "Something went wrong");
+      throw new Error(data.error || "Failed to update role");
     }
 
     return data;
@@ -100,22 +158,30 @@ const addMember = useMutation({
     queryClient.invalidateQueries({
       queryKey: ["members", activeWorkspaceId],
     });
-    setEmail("");
-    setMemberError(null);
-  },
-  onError: (error: any) => {
-    setMemberError(error.message);
   },
 });
 
+const { data: myRoleData } = useQuery({
+  queryKey: ["myRole", activeWorkspaceId],
+  queryFn: async () => {
+    const res = await fetch(
+      `/api/workspaces/${activeWorkspaceId}/my-role`
+    );
+    if (!res.ok) throw new Error("Failed to fetch role");
+    return res.json();
+  },
+  enabled: !!activeWorkspaceId,
+});
 
+  // ✅ IMPORTANT: Early return AFTER all hooks
   if (!activeWorkspaceId) {
     return <div className="p-6">Select a workspace</div>;
   }
 
+
+
   return (
     <div className="p-6 w-full mx-auto">
-
       {/* ================= DOCUMENTS SECTION ================= */}
       <div className="flex w-full items-center justify-between mb-6">
         <h1 className="text-2xl font-semibold">Documents</h1>
@@ -150,61 +216,83 @@ const addMember = useMutation({
       </div>
 
       {/* ================= TEAM SECTION ================= */}
-      <div className="border-t pt-10">
-        <h2 className="text-xl font-semibold mb-6">Team Members</h2>
+<div className="border-t pt-10">
+  <h2 className="text-xl font-semibold mb-6">Team Members</h2>
 
-        {/* Add Member */}
-        <div className="flex gap-3 mb-6">
-          <Input
-            placeholder="User email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
+  {/* 🔥 Only Admin Can Add Members */}
+  {myRoleData?.role === "admin" && (
+    <div className="flex gap-3 mb-6">
+      <Input
+        placeholder="User email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+      />
 
-          <select
-            className="border rounded-md px-3"
-            value={role}
-            onChange={(e) => setRole(e.target.value)}
-          >
-            <option value="admin">Admin</option>
-            <option value="member">Member</option>
-            <option value="viewer">Viewer</option>
-          </select>
+      <select
+        className="border rounded-md px-3"
+        value={role}
+        onChange={(e) => setRole(e.target.value)}
+      >
+        <option value="admin">Admin</option>
+        <option value="member">Member</option>
+        <option value="viewer">Viewer</option>
+      </select>
 
-          <Button
-            disabled={!email || addMember.isPending}
-            onClick={() => addMember.mutate()}
-          >
-            {addMember.isPending ? "Adding..." : "Add"}
-          </Button>
-        </div>
-        {memberError && (
-  <Alert variant="destructive" className="mb-4">
-    <AlertDescription className="flex items-center self-start w-fit"> <AlertCircleIcon /> {memberError}</AlertDescription>
-  </Alert>
-)}
+      <Button
+        disabled={!email || addMember.isPending}
+        onClick={() => addMember.mutate()}
+      >
+        {addMember.isPending ? "Adding..." : "Add"}
+      </Button>
+    </div>
+  )}
 
+  <div className="space-y-3">
+    {membersData?.members?.map((member: any) => (
+      <div
+        key={member.id}
+        className="flex items-center justify-between border p-3 rounded-md"
+      >
+        <div>
+          <p className="font-medium">{member.profiles?.email}</p>
 
-        {/* Members List */}
-        <div className="space-y-3">
-          {membersData?.members?.map((member: any) => (
-            <div
-              key={member.id}
-              className="flex items-center justify-between border p-3 rounded-md"
+          <p className="text-xs text-muted-foreground">
+            Role: {member.role}
+          </p>
+
+          {/* 🔥 Only show dropdown if YOU are admin */}
+          {myRoleData?.role === "admin" && (
+            <select
+              className="border rounded-md px-2 py-1 text-xs mt-2"
+              value={member.role}
+              onChange={(e) =>
+                updateRole.mutate({
+                  memberId: member.id,
+                  role: e.target.value,
+                })
+              }
             >
-              <div>
-                <p className="font-medium">
-                  {member.profiles?.email}
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  Role: {member.role}
-                </p>
-              </div>
-            </div>
-          ))}
+              <option value="admin">Admin</option>
+              <option value="member">Member</option>
+              <option value="viewer">Viewer</option>
+            </select>
+          )}
         </div>
-      </div>
 
+        {/* 🔥 Only show Remove if YOU are admin */}
+        {myRoleData?.role === "admin" && (
+          <Button
+            variant="destructive"
+            size="sm"
+            onClick={() => removeMember.mutate(member.id)}
+          >
+            Remove
+          </Button>
+        )}
+      </div>
+    ))}
+  </div>
+</div>
     </div>
   );
 }

@@ -24,6 +24,7 @@
     "@supabase/supabase-js": "^2.95.3",
     "@tanstack/react-query": "^5.90.21",
     "@uploadthing/react": "^7.3.3",
+    "@y/websocket-server": "^0.1.5",
     "ai": "^5.0.28",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -62,6 +63,9 @@
     "tailwind-scrollbar-hide": "^4.0.0",
     "uploadthing": "^7.7.4",
     "use-file-picker": "^2.1.2",
+    "y-protocols": "^1.0.7",
+    "y-websocket": "^3.0.0",
+    "yjs": "^13.6.29",
     "yup": "^1.7.1",
     "zod": "^4.3.6",
     "zustand": "^5.0.11"
