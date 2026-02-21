@@ -96,7 +96,7 @@ export default function BlockEditorInternal({
 
   return (
     <div className="w-full min-h-[70vh] rounded-lg border bg-white shadow-sm">
-      <BlockNoteView editor={editor} theme="light" />
+      <BlockNoteView editor={editor} />
     </div>
   );
 }
