@@ -15,7 +15,6 @@ async function fetchDocument(id: string) {
 
 export default function DocumentPage() {
   const supabase = createClient();
-
   const params = useParams();
   const router = useRouter();
   const id = params.id as string;
@@ -23,10 +22,8 @@ export default function DocumentPage() {
 
   const [content, setContent] = useState("");
   const [originalContent, setOriginalContent] = useState("");
-  const [activeUsers, setActiveUsers] = useState<string[]>([]);
   const [title, setTitle] = useState("");
   const [titleSaved, setTitleSaved] = useState(true);
-  const [currentUser, setCurrentUser] = useState<string>("Anonymous");
 
   const { data, isLoading } = useQuery({
     queryKey: ["document", id],
@@ -34,26 +31,15 @@ export default function DocumentPage() {
     enabled: !!id,
   });
 
-  // 🔥 Get logged-in user
-  useEffect(() => {
-    async function getUser() {
-      const { data } = await supabase.auth.getUser();
-
-      setCurrentUser(
-        data.user?.user_metadata?.full_name ||
-        data.user?.email ||
-        "Anonymous"
-      );
-    }
-
-    getUser();
-  }, [supabase]);
-
-  // Set title from document
+  // 🔥 Initialize title + content from DB
   useEffect(() => {
     if (data?.document) {
       setTitle(data.document.title || "");
       setTitleSaved(true);
+
+      const dbContent = data.document.content || "";
+      setContent(dbContent);
+      setOriginalContent(dbContent);
     }
   }, [data]);
 
@@ -74,18 +60,19 @@ export default function DocumentPage() {
     },
   });
 
-  // Debounce save
-useEffect(() => {
-  if (content === originalContent) return;
+  // 🔥 Autosave (2s debounce)
+  useEffect(() => {
+    if (!content) return;
+    if (content === originalContent) return;
 
-  const timeout = setTimeout(() => {
-    if (!saveContent.isPending) {
-      saveContent.mutate(content);
-    }
-  }, 2000);
+    const timeout = setTimeout(() => {
+      if (!saveContent.isPending) {
+        saveContent.mutate(content);
+      }
+    }, 2000);
 
-  return () => clearTimeout(timeout);
-}, [content]);
+    return () => clearTimeout(timeout);
+  }, [content, originalContent]);
 
   // ---------------- UPDATE TITLE ----------------
   const updateTitle = useMutation({
@@ -145,27 +132,35 @@ useEffect(() => {
         {titleSaved ? "Title saved" : "Unsaved title changes"}
       </p>
 
+      {/* 🔥 Manual Save Button */}
+      <div className="flex justify-end mb-4">
+        <Button
+          size="sm"
+          disabled={
+            saveContent.isPending || content === originalContent
+          }
+          onClick={() => saveContent.mutate(content)}
+        >
+          {saveContent.isPending ? "Saving..." : "Save Content"}
+        </Button>
+      </div>
+
       {/* BLOCK EDITOR */}
       <BlockEditor
-        documentId={id}
-        userName={currentUser}
-        onYDocChange={(val) => setContent(val)}
-        onPresenceChange={(users) => setActiveUsers(users)}
+        initialContent={content}
+        onChange={(val) => setContent(val)}
       />
 
       {/* STATUS */}
       <div className="mt-4">
         <p className="text-xs text-muted-foreground">
-          {activeUsers.length > 1
-            ? `Editing: ${activeUsers.join(", ")}`
+          {saveContent.isPending
+            ? "Saving..."
             : content === originalContent
             ? "All changes saved"
-            : saveContent.isPending
-            ? "Saving..."
             : "Unsaved changes"}
         </p>
       </div>
-
     </div>
   );
 }

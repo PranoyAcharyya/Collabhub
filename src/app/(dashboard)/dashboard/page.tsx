@@ -5,7 +5,6 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircleIcon } from "lucide-react";
@@ -34,11 +33,25 @@ export default function DashboardPage() {
   const router = useRouter();
   const queryClient = useQueryClient();
 
-  const [email, setEmail] = useState("");
-  const [role, setRole] = useState("member");
+  const [docError, setDocError] = useState<string | null>(null);
   const [memberError, setMemberError] = useState<string | null>(null);
 
-  // ---------------- CREATE DOCUMENT ----------------
+  // ================= MY ROLE =================
+  const { data: myRoleData } = useQuery({
+    queryKey: ["myRole", activeWorkspaceId],
+    queryFn: async () => {
+      const res = await fetch(
+        `/api/workspaces/${activeWorkspaceId}/my-role`
+      );
+      if (!res.ok) throw new Error("Failed to fetch role");
+      return res.json();
+    },
+    enabled: !!activeWorkspaceId,
+  });
+
+  const isAdmin = myRoleData?.role === "admin";
+
+  // ================= CREATE DOCUMENT =================
   const createDocument = useMutation({
     mutationFn: async () => {
       const res = await fetch("/api/documents", {
@@ -50,62 +63,50 @@ export default function DashboardPage() {
         }),
       });
 
-      if (!res.ok) throw new Error("Failed to create");
-      return res.json();
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to create document");
+      }
+
+      return data;
     },
     onSuccess: (data) => {
+      setDocError(null);
       router.push(
         `/dashboard/document/${data.document.id}/${slugify(
           data.document.title
         )}`
       );
     },
+    onError: (error: any) => {
+      setDocError(error.message);
+    },
   });
 
-  // ---------------- DOCUMENTS ----------------
-  const { data, isLoading } = useQuery({
-    queryKey: ["documents", activeWorkspaceId],
-    queryFn: () => fetchDocuments(activeWorkspaceId!),
-    enabled: !!activeWorkspaceId,
-  });
-
-  // ---------------- MEMBERS ----------------
-  const { data: membersData } = useQuery({
-    queryKey: ["members", activeWorkspaceId],
-    queryFn: () => fetchMembers(activeWorkspaceId!),
-    enabled: !!activeWorkspaceId,
-  });
-
-  // ---------------- ADD MEMBER ----------------
-  const addMember = useMutation({
-    mutationFn: async () => {
-      const res = await fetch(`/api/workspaces/${activeWorkspaceId}/members`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, role }),
+  // ================= DELETE DOCUMENT =================
+  const deleteDocument = useMutation({
+    mutationFn: async (docId: string) => {
+      const res = await fetch(`/api/documents/${docId}`, {
+        method: "DELETE",
       });
 
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.error || "Something went wrong");
+        throw new Error(data.error || "Failed to delete document");
       }
 
       return data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["members", activeWorkspaceId],
+        queryKey: ["documents", activeWorkspaceId],
       });
-      setEmail("");
-      setMemberError(null);
-    },
-    onError: (error: any) => {
-      setMemberError(error.message);
     },
   });
 
-  // ---------------- REMOVE MEMBER ----------------
+  // ================= REMOVE MEMBER =================
   const removeMember = useMutation({
     mutationFn: async (memberId: string) => {
       const res = await fetch(
@@ -116,7 +117,7 @@ export default function DashboardPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.error || "Failed to remove");
+        throw new Error(data.error || "Failed to remove member");
       }
 
       return data;
@@ -126,173 +127,123 @@ export default function DashboardPage() {
         queryKey: ["members", activeWorkspaceId],
       });
     },
+    onError: (error: any) => {
+      setMemberError(error.message);
+    },
   });
 
+  // ================= DOCUMENTS =================
+  const { data, isLoading } = useQuery({
+    queryKey: ["documents", activeWorkspaceId],
+    queryFn: () => fetchDocuments(activeWorkspaceId!),
+    enabled: !!activeWorkspaceId,
+  });
 
-  const updateRole = useMutation({
-  mutationFn: async ({
-    memberId,
-    role,
-  }: {
-    memberId: string;
-    role: string;
-  }) => {
-    const res = await fetch(
-      `/api/workspaces/${activeWorkspaceId}/members/${memberId}`,
-      {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ role }),
-      }
-    );
+  // ================= MEMBERS =================
+  const { data: membersData } = useQuery({
+    queryKey: ["members", activeWorkspaceId],
+    queryFn: () => fetchMembers(activeWorkspaceId!),
+    enabled: !!activeWorkspaceId,
+  });
 
-    const data = await res.json();
-
-    if (!res.ok) {
-      throw new Error(data.error || "Failed to update role");
-    }
-
-    return data;
-  },
-  onSuccess: () => {
-    queryClient.invalidateQueries({
-      queryKey: ["members", activeWorkspaceId],
-    });
-  },
-});
-
-const { data: myRoleData } = useQuery({
-  queryKey: ["myRole", activeWorkspaceId],
-  queryFn: async () => {
-    const res = await fetch(
-      `/api/workspaces/${activeWorkspaceId}/my-role`
-    );
-    if (!res.ok) throw new Error("Failed to fetch role");
-    return res.json();
-  },
-  enabled: !!activeWorkspaceId,
-});
-
-  // ✅ IMPORTANT: Early return AFTER all hooks
   if (!activeWorkspaceId) {
     return <div className="p-6">Select a workspace</div>;
   }
 
-
-
   return (
     <div className="p-6 w-full mx-auto">
-      {/* ================= DOCUMENTS SECTION ================= */}
+
+      {/* ================= DOCUMENTS ================= */}
       <div className="flex w-full items-center justify-between mb-6">
         <h1 className="text-2xl font-semibold">Documents</h1>
 
-        <Button
-          onClick={() => createDocument.mutate()}
-          disabled={!activeWorkspaceId || createDocument.isPending}
-        >
-          {createDocument.isPending ? "Creating..." : "New Document"}
-        </Button>
-      </div>
-
-      {isLoading && <p>Loading...</p>}
-
-      {data?.documents?.length === 0 && (
-        <p className="text-muted-foreground">No documents yet.</p>
-      )}
-
-      <div className="space-y-3 mb-12">
-        {data?.documents?.map((doc: any) => (
-          <Link
-            key={doc.id}
-            href={`/dashboard/document/${doc.id}/${slugify(doc.title)}`}
-            className="block p-4 border rounded-lg hover:bg-muted transition"
-          >
-            <p className="font-medium">{doc.title}</p>
-            <p className="text-xs text-muted-foreground">
-              {new Date(doc.created_at).toLocaleDateString()}
-            </p>
-          </Link>
-        ))}
-      </div>
-
-      {/* ================= TEAM SECTION ================= */}
-<div className="border-t pt-10">
-  <h2 className="text-xl font-semibold mb-6">Team Members</h2>
-
-  {/* 🔥 Only Admin Can Add Members */}
-  {myRoleData?.role === "admin" && (
-    <div className="flex gap-3 mb-6">
-      <Input
-        placeholder="User email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-      />
-
-      <select
-        className="border rounded-md px-3"
-        value={role}
-        onChange={(e) => setRole(e.target.value)}
-      >
-        <option value="admin">Admin</option>
-        <option value="member">Member</option>
-        <option value="viewer">Viewer</option>
-      </select>
-
-      <Button
-        disabled={!email || addMember.isPending}
-        onClick={() => addMember.mutate()}
-      >
-        {addMember.isPending ? "Adding..." : "Add"}
-      </Button>
-    </div>
-  )}
-
-  <div className="space-y-3">
-    {membersData?.members?.map((member: any) => (
-      <div
-        key={member.id}
-        className="flex items-center justify-between border p-3 rounded-md"
-      >
-        <div>
-          <p className="font-medium">{member.profiles?.email}</p>
-
-          <p className="text-xs text-muted-foreground">
-            Role: {member.role}
-          </p>
-
-          {/* 🔥 Only show dropdown if YOU are admin */}
-          {myRoleData?.role === "admin" && (
-            <select
-              className="border rounded-md px-2 py-1 text-xs mt-2"
-              value={member.role}
-              onChange={(e) =>
-                updateRole.mutate({
-                  memberId: member.id,
-                  role: e.target.value,
-                })
-              }
-            >
-              <option value="admin">Admin</option>
-              <option value="member">Member</option>
-              <option value="viewer">Viewer</option>
-            </select>
-          )}
-        </div>
-
-        {/* 🔥 Only show Remove if YOU are admin */}
-        {myRoleData?.role === "admin" && (
+        {isAdmin && (
           <Button
-            variant="destructive"
-            size="sm"
-            onClick={() => removeMember.mutate(member.id)}
+            onClick={() => createDocument.mutate()}
+            disabled={createDocument.isPending}
           >
-            Remove
+            {createDocument.isPending ? "Creating..." : "New Document"}
           </Button>
         )}
       </div>
-    ))}
-  </div>
-</div>
+
+      {docError && (
+        <Alert variant="destructive" className="mb-4">
+          <AlertCircleIcon className="h-4 w-4" />
+          <AlertDescription>{docError}</AlertDescription>
+        </Alert>
+      )}
+
+      {isLoading && <p>Loading...</p>}
+
+      <div className="space-y-3 mb-12">
+        {data?.documents?.map((doc: any) => (
+          <div
+            key={doc.id}
+            className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted transition"
+          >
+            <Link
+              href={`/dashboard/document/${doc.id}/${slugify(doc.title)}`}
+              className="flex-1"
+            >
+              <p className="font-medium">{doc.title}</p>
+              <p className="text-xs text-muted-foreground">
+                {new Date(doc.created_at).toLocaleDateString()}
+              </p>
+            </Link>
+
+            {/* 🔥 Only Admin Can Delete */}
+            {isAdmin && (
+              <Button
+                variant="destructive"
+                size="sm"
+                onClick={() => deleteDocument.mutate(doc.id)}
+              >
+                Delete
+              </Button>
+            )}
+          </div>
+        ))}
+      </div>
+
+      {/* ================= TEAM ================= */}
+      <div className="border-t pt-10">
+        <h2 className="text-xl font-semibold mb-6">Team Members</h2>
+
+        {memberError && (
+          <Alert variant="destructive" className="mb-4">
+            <AlertCircleIcon className="h-4 w-4" />
+            <AlertDescription>{memberError}</AlertDescription>
+          </Alert>
+        )}
+
+        <div className="space-y-3">
+          {membersData?.members?.map((member: any) => (
+            <div
+              key={member.id}
+              className="flex items-center justify-between border p-3 rounded-md"
+            >
+              <div>
+                <p className="font-medium">{member.profiles?.email}</p>
+                <p className="text-xs text-muted-foreground">
+                  Role: {member.role}
+                </p>
+              </div>
+
+              {/* 🔥 Only Admin Can Remove */}
+              {isAdmin && (
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  onClick={() => removeMember.mutate(member.id)}
+                >
+                  Remove
+                </Button>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }

@@ -12,7 +12,6 @@ import {
 
 import { useQuery } from "@tanstack/react-query";
 import { NavMain } from "@/components/nav-main";
-import { NavProjects } from "@/components/nav-projects";
 import { NavUser } from "@/components/nav-user";
 import {
   Sidebar,
@@ -33,6 +32,7 @@ import {
 
 import { WorkspaceCreateForm } from "@/components/WorkspaceCreateForm";
 import { useWorkspaceStore } from "@/store/workspaceStore"
+import { useRouter } from "next/navigation";
 
 interface AppSidebarProps
   extends React.ComponentProps<typeof Sidebar> {
@@ -52,6 +52,7 @@ async function fetchWorkspaces() {
 export function AppSidebar({ user, ...props }: AppSidebarProps) {
   const [open, setOpen] = React.useState(false);
 const { activeWorkspaceId, setActiveWorkspace } = useWorkspaceStore()
+const router = useRouter();
 
   const { data } = useQuery({
     queryKey: ["workspaces"],
@@ -61,7 +62,10 @@ const { activeWorkspaceId, setActiveWorkspace } = useWorkspaceStore()
 const workspaceItems =
   data?.workspaces?.map((ws: any) => ({
     title: ws.name,
-    onClick: () => setActiveWorkspace(ws.id),
+    onClick: () => {
+      setActiveWorkspace(ws.id);
+      router.push("/dashboard"); // 🔥 this fixes your issue
+    },
     isActive: activeWorkspaceId === ws.id,
   })) || []
 
@@ -80,41 +84,9 @@ const workspaceItems =
       icon: GalleryVerticalEnd,
       isActive: true,
       items: workspaceItems,
-    },
-    {
-      title: "Team",
-      url: "/dashboard/team",
-      icon: Users,
-      items: [
-        {
-          title: "Members",
-          url: "/dashboard/team",
-        },
-        {
-          title: "Invitations",
-          url: "/dashboard/team/invitations",
-        },
-      ],
-    },
-    {
-      title: "Activity",
-      url: "/dashboard/activity",
-      icon: Activity,
-    },
-  ];
+    }]
 
-  const projects = [
-    {
-      name: "Billing",
-      url: "/dashboard/billing",
-      icon: CreditCard,
-    },
-    {
-      name: "Settings",
-      url: "/dashboard/settings",
-      icon: Settings2,
-    },
-  ];
+
 
   return (
     <Sidebar collapsible="icon" {...props}>
@@ -147,7 +119,7 @@ const workspaceItems =
             </DialogContent>
           </Dialog>
         </div>
-        <NavProjects projects={projects} />
+   
       </SidebarContent>
 
       <SidebarFooter>

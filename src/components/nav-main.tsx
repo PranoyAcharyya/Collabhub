@@ -1,7 +1,7 @@
 "use client";
 
 import { ChevronRight, type LucideIcon } from "lucide-react";
-
+import { useRouter } from "next/navigation";
 import {
   Collapsible,
   CollapsibleContent,
@@ -30,9 +30,13 @@ export function NavMain({
     items?: {
       title: string;
       url: string;
+      onClick?: () => void;
+  isActive?: boolean;
     }[];
   }[];
 }) {
+  const router = useRouter();
+
   return (
     <SidebarGroup>
       <SidebarGroupLabel>Platform</SidebarGroupLabel>
@@ -58,7 +62,10 @@ export function NavMain({
                     <SidebarMenuSubItem key={subItem.title}>
                       <SidebarMenuSubButton asChild>
                         <button
-                          onClick={subItem.onClick}
+                          onClick={() => {
+                            subItem.onClick?.(); 
+                            router.push("/dashboard"); 
+                          }}
                           className={`w-full text-left ${
                             subItem.isActive ? "font-semibold text-primary" : ""
                           }`}
