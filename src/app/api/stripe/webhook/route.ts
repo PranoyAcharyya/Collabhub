@@ -33,18 +33,29 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: err.message }, { status: 400 });
   }
 
-  // ✅ When checkout completes
-  if (event.type === "checkout.session.completed") {
-    const session = event.data.object as Stripe.Checkout.Session;
+ if (event.type === "checkout.session.completed") {
+  const session = event.data.object as Stripe.Checkout.Session;
 
-    const userId = session.metadata?.userId;
+  const userId = session.metadata?.userId;
 
-    if (userId) {
+  if (userId && session.subscription) {
+    try {
+      // 🔥 Get subscription details from Stripe
+      const subscription = await stripe.subscriptions.retrieve(
+        session.subscription as string
+      );
+
+      const currentPeriodEnd = new Date(
+        subscription.current_period_end * 1000
+      );
+
       const { error } = await supabaseAdmin
         .from("profiles")
         .update({
           plan: "pro",
-          subscription_status: "active",
+          subscription_status: subscription.status,
+          stripe_subscription_id: subscription.id,
+          current_period_end: currentPeriodEnd,
         })
         .eq("id", userId);
 
@@ -53,8 +64,11 @@ export async function POST(req: Request) {
       } else {
         console.log("User upgraded to pro:", userId);
       }
+    } catch (err) {
+      console.error("Subscription fetch error:", err);
     }
   }
+}
 
   return NextResponse.json({ received: true });
 }

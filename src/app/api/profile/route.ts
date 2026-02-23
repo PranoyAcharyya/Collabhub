@@ -34,5 +34,11 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  return NextResponse.json({ user });
+  const { data, error } = await supabase
+    .from("profiles")
+    .select("id, plan, current_period_end")
+    .eq("id", user.id)
+    .single();
+
+  return NextResponse.json({ data, error });
 }
