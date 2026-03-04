@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Check } from "lucide-react"
+import { TextAnimate } from "@/components/ui/text-animate";
 
 export default function PricingSection() {
   return (
@@ -12,9 +13,25 @@ export default function PricingSection() {
           PRICING PLANS
         </p>
 
-        <h1 className="text-5xl font-bold tracking-tight leading-tight">
-          SIMPLE. TRANSPARENT. <br /> POWERFUL.
-        </h1>
+        <TextAnimate
+          as="h1"
+          animation="blurInUp"
+          by="word"
+          once
+          className="
+            text-2xl 
+            md:text-5xl 
+            lg:text-[75px] 
+            leading-[1.05] 
+            text-center 
+            font-bold 
+            max-w-[80%] 
+            mx-auto
+           dark:mix-blend-difference
+          "
+        >
+          SIMPLE. TRANSPARENT. POWERFUL.
+        </TextAnimate>
 
         <p className="mt-6 text-muted-foreground">
           Choose a plan that scales with your workflow. <br />
