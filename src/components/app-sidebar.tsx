@@ -34,12 +34,15 @@ import { WorkspaceCreateForm } from "@/components/WorkspaceCreateForm";
 import { useWorkspaceStore } from "@/store/workspaceStore"
 import { useRouter } from "next/navigation";
 
+
+
+
 interface AppSidebarProps
   extends React.ComponentProps<typeof Sidebar> {
   user: {
     name: string;
     email: string;
-    avatar: string;
+    avatar_url: string;
   };
 }
 
@@ -64,7 +67,7 @@ const workspaceItems =
     title: ws.name,
     onClick: () => {
       setActiveWorkspace(ws.id);
-      router.push("/dashboard"); // 🔥 this fixes your issue
+      router.push("/dashboard"); 
     },
     isActive: activeWorkspaceId === ws.id,
   })) || []

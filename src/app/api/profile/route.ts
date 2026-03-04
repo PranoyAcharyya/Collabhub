@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
@@ -34,11 +36,11 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { data, error } = await supabase
-    .from("profiles")
-    .select("id, plan, current_period_end")
-    .eq("id", user.id)
-    .single();
+const { data } = await supabase
+  .from("profiles")
+  .select("id, plan, current_period_end, full_name, avatar_url")
+  .eq("id", user.id)
+  .single();
 
-  return NextResponse.json({ data, error });
+  return NextResponse.json({ profile: data });
 }

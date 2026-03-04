@@ -15,7 +15,7 @@ export async function GET(request: Request) {
       "http://localhost:3000/dashboard"
     );
 
-    // ✅ FIX: await cookies()
+
     const cookieStore = await cookies();
 
     const supabase = createServerClient(
