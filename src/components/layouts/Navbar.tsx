@@ -16,12 +16,17 @@ import {
 } from "@/components/ui/sheet";
 import { Menu, SquareMenu } from "lucide-react";
 import { AnimatedThemeToggler } from "@/components/ui/animated-theme-toggler";
+import { useRouter } from "next/navigation"
 
 const Navbar = () => {
+
+  const router = useRouter()
+
+
   return (
     <nav className="container max-w-full fixed top-0 left-0 z-10 bg-white-300 backdrop-blur-2xl">
       <div className="flex container max-w-7xl items-center justify-between mx-auto px-5 py-3 ">
-          <img src="/images/collabhub-bw.png" className="sitelogo"/>
+          <img src="/images/collabhub-bw.png" className="sitelogo" onClick={()=>router.push("/")}/>
       <div className="hidden md:flex">
         <NavigationMenuDemo />
       </div>
