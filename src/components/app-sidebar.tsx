@@ -33,6 +33,7 @@ import {
 import { WorkspaceCreateForm } from "@/components/WorkspaceCreateForm";
 import { useWorkspaceStore } from "@/store/workspaceStore"
 import { useRouter } from "next/navigation";
+import { AnimatedThemeToggler } from "./ui/animated-theme-toggler";
 
 
 
@@ -122,7 +123,7 @@ const workspaceItems =
             </DialogContent>
           </Dialog>
         </div>
-   
+
       </SidebarContent>
 
       <SidebarFooter>

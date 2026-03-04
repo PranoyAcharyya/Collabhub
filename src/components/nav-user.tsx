@@ -31,6 +31,8 @@ import {
 } from "@/components/ui/sidebar"
 import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client";
+import { ModeToggle } from "./themetoggle"
+import { AnimatedThemeToggler } from "./ui/animated-theme-toggler"
 
 
 
@@ -114,6 +116,8 @@ const handleLogout = async () => {
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
+              <AnimatedThemeToggler/>
+             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={handleLogout}>
               <LogOut />
               Log out

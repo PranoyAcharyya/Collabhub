@@ -27,7 +27,7 @@ export function WorkspaceCreateForm({ onSuccess }: Props) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["workspaces"] });
       setWorkspaceName("");
-      onSuccess(); // 🔥 CLOSE DIALOG
+      onSuccess(); 
     },
   });
 
