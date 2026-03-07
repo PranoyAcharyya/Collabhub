@@ -40,14 +40,15 @@ export async function POST(req: Request) {
 
   if (userId && session.subscription) {
     try {
-      // 🔥 Get subscription details from Stripe
-      const subscription = await stripe.subscriptions.retrieve(
-        session.subscription as string
-      );
+     const subscription = await stripe.subscriptions.retrieve(
+  session.subscription as string
+) as Stripe.Subscription;
 
-      const currentPeriodEnd = new Date(
-        subscription.current_period_end * 1000
-      );
+      const sub = subscription as Stripe.Subscription & {
+  current_period_end: number;
+};
+
+const currentPeriodEnd = new Date(sub.current_period_end * 1000);
 
       const { error } = await supabaseAdmin
         .from("profiles")
