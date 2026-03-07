@@ -16,6 +16,8 @@ The goal of this project was to build a production-style SaaS architecture using
 * React
 * TypeScript
 * Tailwind CSS
+* Shad Cn
+* Magic Ui
 
 ### Backend
 
