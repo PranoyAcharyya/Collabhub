@@ -16,6 +16,13 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 async function fetchDocuments(workspaceId: string) {
   const res = await fetch(`/api/documents?workspaceId=${workspaceId}`);
@@ -44,15 +51,16 @@ export default function DashboardPage() {
   const [docError, setDocError] = useState<string | null>(null);
   const [memberError, setMemberError] = useState<string | null>(null);
   const [email, setEmail] = useState("");
-const [addError, setAddError] = useState<string | null>(null);
+  const [addError, setAddError] = useState<string | null>(null);
+  const [selectedMemberId, setSelectedMemberId] = useState<string | null>(null);
+  const [selectedRole, setSelectedRole] = useState("member");
+  const [roleError, setRoleError] = useState<string | null>(null);
 
   // ================= MY ROLE =================
   const { data: myRoleData } = useQuery({
     queryKey: ["myRole", activeWorkspaceId],
     queryFn: async () => {
-      const res = await fetch(
-        `/api/workspaces/${activeWorkspaceId}/my-role`
-      );
+      const res = await fetch(`/api/workspaces/${activeWorkspaceId}/my-role`);
       if (!res.ok) throw new Error("Failed to fetch role");
       return res.json();
     },
@@ -85,8 +93,8 @@ const [addError, setAddError] = useState<string | null>(null);
       setDocError(null);
       router.push(
         `/dashboard/document/${data.document.id}/${slugify(
-          data.document.title
-        )}`
+          data.document.title,
+        )}`,
       );
     },
     onError: (error: any) => {
@@ -116,49 +124,46 @@ const [addError, setAddError] = useState<string | null>(null);
     },
   });
 
-
+  // add member
 
   const addMember = useMutation({
-  mutationFn: async () => {
-    const res = await fetch(
-      `/api/workspaces/${activeWorkspaceId}/members`,
-      {
+    mutationFn: async () => {
+      const res = await fetch(`/api/workspaces/${activeWorkspaceId}/members`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           email,
           role: "member",
         }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to add member");
       }
-    );
 
-    const data = await res.json();
+      return data;
+    },
+    onSuccess: () => {
+      setEmail("");
+      setAddError(null);
 
-    if (!res.ok) {
-      throw new Error(data.error || "Failed to add member");
-    }
-
-    return data;
-  },
-  onSuccess: () => {
-    setEmail("");
-    setAddError(null);
-
-    queryClient.invalidateQueries({
-      queryKey: ["members", activeWorkspaceId],
-    });
-  },
-  onError: (err: any) => {
-    setAddError(err.message);
-  },
-});
+      queryClient.invalidateQueries({
+        queryKey: ["members", activeWorkspaceId],
+      });
+    },
+    onError: (err: any) => {
+      setAddError(err.message);
+    },
+  });
 
   // ================= REMOVE MEMBER =================
   const removeMember = useMutation({
     mutationFn: async (memberId: string) => {
       const res = await fetch(
         `/api/workspaces/${activeWorkspaceId}/members/${memberId}`,
-        { method: "DELETE" }
+        { method: "DELETE" },
       );
 
       const data = await res.json();
@@ -176,6 +181,39 @@ const [addError, setAddError] = useState<string | null>(null);
     },
     onError: (error: any) => {
       setMemberError(error.message);
+    },
+  });
+
+  const updateRole = useMutation({
+    mutationFn: async () => {
+      const res = await fetch(
+        `/api/workspaces/${activeWorkspaceId}/members/${selectedMemberId}`,
+        {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            role: selectedRole,
+          }),
+        },
+      );
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to update role");
+      }
+
+      return data;
+    },
+    onSuccess: () => {
+      setRoleError(null);
+
+      queryClient.invalidateQueries({
+        queryKey: ["members", activeWorkspaceId],
+      });
+    },
+    onError: (err: any) => {
+      setRoleError(err.message);
     },
   });
 
@@ -199,7 +237,6 @@ const [addError, setAddError] = useState<string | null>(null);
 
   return (
     <div className="p-6 w-full mx-auto">
-
       {/* ================= DOCUMENTS ================= */}
       <div className="flex w-full items-center justify-between mb-6">
         <h1 className="text-2xl font-semibold">Documents</h1>
@@ -255,43 +292,43 @@ const [addError, setAddError] = useState<string | null>(null);
 
       {/* ================= TEAM ================= */}
       <div className="border-t pt-10">
-       <div className="flex items-center justify-between mb-6">
-  <h2 className="text-xl font-semibold">Team Members</h2>
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-xl font-semibold">Team Members</h2>
 
-  {isAdmin && (
-  <Dialog>
-    <DialogTrigger asChild>
-      <Button size="sm">Add Member</Button>
-    </DialogTrigger>
+          {isAdmin && (
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button size="sm">Add Member</Button>
+              </DialogTrigger>
 
-    <DialogContent>
-      <DialogHeader>
-        <DialogTitle>Add Member</DialogTitle>
-      </DialogHeader>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Add Member</DialogTitle>
+                </DialogHeader>
 
-      <div className="space-y-4">
-        <Input
-          placeholder="Enter user email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
+                <div className="space-y-4">
+                  <Input
+                    placeholder="Enter user email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                  />
 
-        {addError && (
-          <p className="text-sm text-red-500">{addError}</p>
-        )}
+                  {addError && (
+                    <p className="text-sm text-red-500">{addError}</p>
+                  )}
 
-        <Button
-          className="w-full"
-          onClick={() => addMember.mutate()}
-          disabled={addMember.isPending}
-        >
-          {addMember.isPending ? "Adding..." : "Add Member"}
-        </Button>
-      </div>
-    </DialogContent>
-  </Dialog>
-)}
-</div>
+                  <Button
+                    className="w-full"
+                    onClick={() => addMember.mutate()}
+                    disabled={addMember.isPending}
+                  >
+                    {addMember.isPending ? "Adding..." : "Add Member"}
+                  </Button>
+                </div>
+              </DialogContent>
+            </Dialog>
+          )}
+        </div>
 
         {memberError && (
           <Alert variant="destructive" className="mb-4">
@@ -313,15 +350,68 @@ const [addError, setAddError] = useState<string | null>(null);
                 </p>
               </div>
 
-              {/* 🔥 Only Admin Can Remove */}
               {isAdmin && (
-                <Button
-                  variant="destructive"
-                  size="sm"
-                  onClick={() => removeMember.mutate(member.id)}
-                >
-                  Remove
-                </Button>
+                <div className="flex gap-2">
+                  {/* EDIT ROLE */}
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        onClick={() => {
+                          setSelectedMemberId(member.id);
+                          setSelectedRole(member.role);
+                        }}
+                      >
+                        Edit Role
+                      </Button>
+                    </DialogTrigger>
+
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Edit Member Role</DialogTitle>
+                      </DialogHeader>
+
+                      <div className="space-y-4">
+                        <Select
+                          value={selectedRole}
+                          onValueChange={(value) => setSelectedRole(value)}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select role" />
+                          </SelectTrigger>
+
+                          <SelectContent>
+                            <SelectItem value="admin">Admin</SelectItem>
+                            <SelectItem value="member">Member</SelectItem>
+                            <SelectItem value="viewer">Viewer</SelectItem>
+                          </SelectContent>
+                        </Select>
+
+                        {roleError && (
+                          <p className="text-sm text-red-500">{roleError}</p>
+                        )}
+
+                        <Button
+                          className="w-full"
+                          onClick={() => updateRole.mutate()}
+                          disabled={updateRole.isPending}
+                        >
+                          {updateRole.isPending ? "Updating..." : "Update Role"}
+                        </Button>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+
+                  {/* REMOVE MEMBER */}
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={() => removeMember.mutate(member.id)}
+                  >
+                    Remove
+                  </Button>
+                </div>
               )}
             </div>
           ))}
