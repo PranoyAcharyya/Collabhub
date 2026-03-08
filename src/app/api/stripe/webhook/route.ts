@@ -33,23 +33,34 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: err.message }, { status: 400 });
   }
 
- if (event.type === "checkout.session.completed") {
-  const session = event.data.object as Stripe.Checkout.Session;
+  // ================= HANDLE CHECKOUT COMPLETION =================
+  if (event.type === "checkout.session.completed") {
+    const session = event.data.object as Stripe.Checkout.Session;
 
-  const userId = session.metadata?.userId;
-
-  if (userId && session.subscription) {
     try {
-     const subscription = await stripe.subscriptions.retrieve(
-  session.subscription as string
-) as Stripe.Subscription;
+      // 🔥 Retrieve full session (metadata is guaranteed here)
+      const fullSession = await stripe.checkout.sessions.retrieve(session.id);
+
+      const userId = fullSession.metadata?.userId;
+      const subscriptionId = fullSession.subscription as string;
+
+      if (!userId || !subscriptionId) {
+        console.error("Missing userId or subscriptionId in session metadata");
+        return NextResponse.json({ received: true });
+      }
+
+      // 🔥 Get subscription details
+      const subscription = (await stripe.subscriptions.retrieve(
+        subscriptionId
+      )) as Stripe.Subscription;
 
       const sub = subscription as Stripe.Subscription & {
-  current_period_end: number;
-};
+        current_period_end: number;
+      };
 
-const currentPeriodEnd = new Date(sub.current_period_end * 1000);
+      const currentPeriodEnd = new Date(sub.current_period_end * 1000);
 
+      // 🔥 Update Supabase
       const { error } = await supabaseAdmin
         .from("profiles")
         .update({
@@ -69,7 +80,6 @@ const currentPeriodEnd = new Date(sub.current_period_end * 1000);
       console.error("Subscription fetch error:", err);
     }
   }
-}
 
   return NextResponse.json({ received: true });
 }
