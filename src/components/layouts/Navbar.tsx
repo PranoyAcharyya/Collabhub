@@ -45,7 +45,7 @@ const Navbar = () => {
             <SheetHeader>
               <SheetTitle>Quick Links</SheetTitle>
               <SheetDescription>
-                <Button variant="outline">Login</Button>
+                <Button variant="outline" onClick={()=>router.push("/login")}>Login</Button>
               </SheetDescription>
             </SheetHeader>
           </SheetContent>
