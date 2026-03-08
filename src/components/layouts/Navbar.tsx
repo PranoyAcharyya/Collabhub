@@ -31,7 +31,7 @@ const Navbar = () => {
         <NavigationMenuDemo />
       </div>
       <div className="flex items-center gap-2 ">
-        <Button variant="outline" className="hidden md:block">
+        <Button variant="outline" className="hidden md:block" onClick={()=>router.push("/login")}>
           Login
         </Button>
         {/* <ModeToggle /> */}
