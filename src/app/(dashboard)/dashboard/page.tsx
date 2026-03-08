@@ -8,6 +8,14 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircleIcon } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 
 async function fetchDocuments(workspaceId: string) {
   const res = await fetch(`/api/documents?workspaceId=${workspaceId}`);
@@ -35,6 +43,8 @@ export default function DashboardPage() {
 
   const [docError, setDocError] = useState<string | null>(null);
   const [memberError, setMemberError] = useState<string | null>(null);
+  const [email, setEmail] = useState("");
+const [addError, setAddError] = useState<string | null>(null);
 
   // ================= MY ROLE =================
   const { data: myRoleData } = useQuery({
@@ -105,6 +115,43 @@ export default function DashboardPage() {
       });
     },
   });
+
+
+
+  const addMember = useMutation({
+  mutationFn: async () => {
+    const res = await fetch(
+      `/api/workspaces/${activeWorkspaceId}/members`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email,
+          role: "member",
+        }),
+      }
+    );
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      throw new Error(data.error || "Failed to add member");
+    }
+
+    return data;
+  },
+  onSuccess: () => {
+    setEmail("");
+    setAddError(null);
+
+    queryClient.invalidateQueries({
+      queryKey: ["members", activeWorkspaceId],
+    });
+  },
+  onError: (err: any) => {
+    setAddError(err.message);
+  },
+});
 
   // ================= REMOVE MEMBER =================
   const removeMember = useMutation({
@@ -208,7 +255,43 @@ export default function DashboardPage() {
 
       {/* ================= TEAM ================= */}
       <div className="border-t pt-10">
-        <h2 className="text-xl font-semibold mb-6">Team Members</h2>
+       <div className="flex items-center justify-between mb-6">
+  <h2 className="text-xl font-semibold">Team Members</h2>
+
+  {isAdmin && (
+  <Dialog>
+    <DialogTrigger asChild>
+      <Button size="sm">Add Member</Button>
+    </DialogTrigger>
+
+    <DialogContent>
+      <DialogHeader>
+        <DialogTitle>Add Member</DialogTitle>
+      </DialogHeader>
+
+      <div className="space-y-4">
+        <Input
+          placeholder="Enter user email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
+
+        {addError && (
+          <p className="text-sm text-red-500">{addError}</p>
+        )}
+
+        <Button
+          className="w-full"
+          onClick={() => addMember.mutate()}
+          disabled={addMember.isPending}
+        >
+          {addMember.isPending ? "Adding..." : "Add Member"}
+        </Button>
+      </div>
+    </DialogContent>
+  </Dialog>
+)}
+</div>
 
         {memberError && (
           <Alert variant="destructive" className="mb-4">
