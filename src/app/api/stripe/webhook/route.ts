@@ -35,21 +35,25 @@ export async function POST(req: Request) {
 
   // ================= HANDLE CHECKOUT COMPLETION =================
   if (event.type === "checkout.session.completed") {
+     console.log("Webhook triggered: checkout.session.completed");
     const session = event.data.object as Stripe.Checkout.Session;
+console.log("Session object:", session);
 
     try {
-      // 🔥 Retrieve full session (metadata is guaranteed here)
+      //Retrieve full session (metadata is guaranteed here)
       const fullSession = await stripe.checkout.sessions.retrieve(session.id);
 
       const userId = fullSession.metadata?.userId;
       const subscriptionId = fullSession.subscription as string;
+      console.log("userId:", userId);
+    console.log("subscriptionId:", subscriptionId);
 
       if (!userId || !subscriptionId) {
         console.error("Missing userId or subscriptionId in session metadata");
         return NextResponse.json({ received: true });
       }
 
-      // 🔥 Get subscription details
+      // Get subscription details
       const subscription = (await stripe.subscriptions.retrieve(
         subscriptionId
       )) as Stripe.Subscription;
@@ -60,7 +64,7 @@ export async function POST(req: Request) {
 
       const currentPeriodEnd = new Date(sub.current_period_end * 1000);
 
-      // 🔥 Update Supabase
+      //  Update Supabase
       const { error } = await supabaseAdmin
         .from("profiles")
         .update({
