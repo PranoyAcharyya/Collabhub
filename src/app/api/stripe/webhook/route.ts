@@ -58,12 +58,9 @@ export async function POST(req: Request) {
         subscriptionId
       )) as Stripe.Subscription;
 
-      const sub = subscription as Stripe.Subscription & {
-        current_period_end: number;
-      };
-
-      const currentPeriodEnd = new Date(sub.current_period_end * 1000);
-
+     const currentPeriodEnd = new Date(
+  (subscription as any).current_period_end * 1000);
+  
       //  Update Supabase
       const { error } = await supabaseAdmin
         .from("profiles")
