@@ -72,6 +72,7 @@ export async function POST(req: Request) {
           subscription_status: subscription.status,
           stripe_subscription_id: subscription.id,
           current_period_end: currentPeriodEnd,
+          subscription_ends_at: currentPeriodEnd
         })
         .eq("id", userId);
 
