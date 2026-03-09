@@ -57,7 +57,7 @@ export async function POST(req: Request) {
       const subscription = (await stripe.subscriptions.retrieve(
         subscriptionId
       )) as Stripe.Subscription;
-      console.log("SUBSCRIPTION OBJECT:", subscription);
+      // console.log("SUBSCRIPTION OBJECT:", subscription);
 
     const billingAnchor = (subscription as any).billing_cycle_anchor;
 
