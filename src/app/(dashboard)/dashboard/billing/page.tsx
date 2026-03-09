@@ -45,7 +45,7 @@ export default function BillingPage() {
     <div className="p-10 max-w-2xl mx-auto">
       <h1 className="text-3xl font-bold mb-6">Billing</h1>
       <p>User ID: {data?.profile?.id}</p>
-<p>Plan: {profile?.plan}</p>
+<p className="capitalize font-bold">Plan: {profile?.plan}</p>
       <div className="border p-6 rounded-lg space-y-4 mt-4">
 
         {isPro ? (
