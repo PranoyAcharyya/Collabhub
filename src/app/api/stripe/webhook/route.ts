@@ -59,10 +59,10 @@ export async function POST(req: Request) {
       )) as Stripe.Subscription;
       console.log("SUBSCRIPTION OBJECT:", subscription);
 
-     const currentPeriodEnd = new Date(
-  (subscription as any).current_period_end * 1000);
-  console.log("CALCULATED DATE:", currentPeriodEnd);
+    const billingAnchor = (subscription as any).billing_cycle_anchor;
 
+const currentPeriodEnd = new Date(billingAnchor * 1000);
+currentPeriodEnd.setMonth(currentPeriodEnd.getMonth() + 1);
       //  Update Supabase
       const { error } = await supabaseAdmin
         .from("profiles")
