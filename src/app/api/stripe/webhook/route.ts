@@ -5,7 +5,7 @@ import { createClient } from "@supabase/supabase-js";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
-// 🔥 Admin client (bypasses RLS)
+// Admin client (bypasses RLS)
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
@@ -37,7 +37,7 @@ export async function POST(req: Request) {
   if (event.type === "checkout.session.completed") {
      console.log("Webhook triggered: checkout.session.completed");
     const session = event.data.object as Stripe.Checkout.Session;
-console.log("Session object:", session);
+// console.log("Session object:", session);
 
     try {
       //Retrieve full session (metadata is guaranteed here)
@@ -45,8 +45,8 @@ console.log("Session object:", session);
 
       const userId = fullSession.metadata?.userId;
       const subscriptionId = fullSession.subscription as string;
-      console.log("userId:", userId);
-    console.log("subscriptionId:", subscriptionId);
+    //   console.log("userId:", userId);
+    // console.log("subscriptionId:", subscriptionId);
 
       if (!userId || !subscriptionId) {
         console.error("Missing userId or subscriptionId in session metadata");
