@@ -3,6 +3,21 @@
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+
+const cancelSubscription = async () => {
+  await fetch("/api/stripe/cancel", {
+    method: "POST",
+  });
+
+  window.location.reload();
+};
 
 async function fetchProfile() {
   const res = await fetch("/api/profile");
@@ -45,9 +60,8 @@ export default function BillingPage() {
     <div className="p-10 max-w-2xl mx-auto">
       <h1 className="text-3xl font-bold mb-6">Billing</h1>
       <p>User ID: {data?.profile?.id}</p>
-<p className="capitalize font-bold">Plan: {profile?.plan}</p>
+      <p className="capitalize font-bold">Plan: {profile?.plan}</p>
       <div className="border p-6 rounded-lg space-y-4 mt-4">
-
         {isPro ? (
           <>
             <h2 className="text-xl font-semibold">Pro Plan 🚀</h2>
@@ -61,9 +75,28 @@ export default function BillingPage() {
               </span>
             </p>
 
-            <Button variant="outline">
-              Manage Subscription
-            </Button>
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button variant="outline">Manage Subscription</Button>
+              </DialogTrigger>
+
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Manage Subscription</DialogTitle>
+                </DialogHeader>
+
+                <div className="space-y-4">
+                  <p className="text-sm text-muted-foreground">
+                    Your subscription will remain active until the end of the
+                    billing period.
+                  </p>
+
+                  <Button variant="destructive" onClick={cancelSubscription}>
+                    Cancel Subscription
+                  </Button>
+                </div>
+              </DialogContent>
+            </Dialog>
           </>
         ) : (
           <>
