@@ -96,6 +96,7 @@ const SignupPage = () => {
           <ShineBorder shineColor={["#A07CFE", "#FE8FB5", "#FFBE7B"]} />
 
           <img
+          onClick={()=>router.push("/")}
             src="/images/logo.png"
             className="self-center w-12 mb-1 sitelogo"
             alt="CollabHub Logo"
