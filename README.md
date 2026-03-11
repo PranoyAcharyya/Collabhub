@@ -24,6 +24,22 @@ The goal of this project was to build a production-style SaaS architecture using
 * Next.js API Routes
 * Supabase (PostgreSQL)
 
+
+## Network Requirement
+
+Supabase endpoints may be blocked or unstable from some regions in India due to ISP restrictions.
+
+If you face connection issues while running the project locally, use a DNS/VPN workaround such as **Cloudflare WARP (1.1.1.1)**.
+
+### Steps
+
+1. Install Cloudflare WARP: https://1.1.1.1/
+2. Enable WARP mode.
+3. Run the development server again.
+
+```bash
+npm run dev
+
 ### Infrastructure
 
 * Supabase Auth
