@@ -7,7 +7,6 @@ import { TextAnimate } from "@/components/ui/text-animate";
 import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ShineBorder } from "@/components/ui/shine-border";
-import { RetroGrid } from "@/components/ui/retro-grid"
 import { Globe } from "@/components/ui/globe"
 
 
@@ -124,7 +123,7 @@ const secondRow = reviews.slice(reviews.length / 2)
     <>
      <section className="min-h-screen px-5 flex flex-col justify-center items-center gap-5 relative overflow-hidden">
 
-     {/* <RetroGrid /> */}
+    
 <Globe className="top-20" />
 
   {/* Content */}

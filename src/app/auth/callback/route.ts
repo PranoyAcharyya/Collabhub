@@ -8,11 +8,11 @@ export async function GET(request: Request) {
     const code = searchParams.get("code");
 
     if (!code) {
-      return NextResponse.redirect("http://localhost:3000");
+      return NextResponse.redirect("https://collabhub-rho.vercel.app/");
     }
 
     const response = NextResponse.redirect(
-      "http://localhost:3000/dashboard"
+      "https://collabhub-rho.vercel.app/dashboard"
     );
 
 
@@ -40,7 +40,7 @@ export async function GET(request: Request) {
 
     if (error) {
       console.error("Exchange error:", error);
-      return NextResponse.redirect("http://localhost:3000/login");
+      return NextResponse.redirect("https://collabhub-rho.vercel.app/login");
     }
 
     return response;
