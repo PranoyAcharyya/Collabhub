@@ -10,18 +10,26 @@ async function fetchWorkspaces() {
 }
 
 export default function WorkspacesPage() {
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, refetch } = useQuery({
     queryKey: ["myWorkspaces"],
     queryFn: fetchWorkspaces,
   });
 
   const deleteWorkspace = async (id: string) => {
-  await fetch(`/api/workspaces/${id}/delete`, {
-    method: "DELETE",
-  });
+    await fetch(`/api/workspaces/${id}/delete`, {
+      method: "DELETE",
+    });
 
-  window.location.reload();
-};
+    refetch();
+  };
+
+  const leaveWorkspace = async (id: string) => {
+    await fetch(`/api/workspaces/${id}/leave`, {
+      method: "DELETE",
+    });
+
+    refetch();
+  };
 
   if (isLoading) return <div className="p-6">Loading...</div>;
 
@@ -42,17 +50,30 @@ export default function WorkspacesPage() {
           </div>
 
           <div className="flex gap-2">
-            <Button size="sm" variant="outline">
-              Edit
-            </Button>
+            {workspace.role === "admin" && (
+              <>
+                <Button size="sm" variant="outline">
+                  Edit
+                </Button>
 
-            <Button size="sm" variant="destructive" onClick={() => deleteWorkspace(workspace.id)}>
-              Delete
-            </Button>
+                <Button
+                  size="sm"
+                  variant="destructive"
+                  onClick={() => deleteWorkspace(workspace.id)}
+                >
+                  Delete
+                </Button>
+              </>
+            )}
 
-            <Button size="sm">
-              Leave
-            </Button>
+            {workspace.role !== "admin" && (
+              <Button
+                size="sm"
+                onClick={() => leaveWorkspace(workspace.id)}
+              >
+                Leave
+              </Button>
+            )}
           </div>
         </div>
       ))}
