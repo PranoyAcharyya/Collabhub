@@ -52,7 +52,7 @@ const Navbar = () => {
                    <li><Link href="/dashboard/account">Account</Link></li>
                 </ul>
                
-                <Button variant="outline" onClick={()=>router.push("/login")}>Login</Button>
+                <Button variant="outline" onClick={()=>router.push("/login")} className="mt-4">Login</Button>
               </SheetDescription>
             </SheetHeader>
           </SheetContent>
