@@ -14,16 +14,30 @@ export default function BlockEditorInternal({
   initialContent,
   onChange,
 }: BlockEditorProps) {
-  const editor = useCreateBlockNote({
-    initialContent: initialContent
-      ? JSON.parse(initialContent)
+
+  let parsedContent = null;
+
+  try {
+    parsedContent = initialContent ? JSON.parse(initialContent) : null;
+  } catch {
+    parsedContent = null;
+  }
+
+  // BlockNote requires a NON EMPTY block array
+  const safeContent =
+    Array.isArray(parsedContent) && parsedContent.length > 0
+      ? parsedContent
       : [
           {
             type: "paragraph",
             content: [],
           },
-        ],
+        ];
+
+  const editor = useCreateBlockNote({
+    initialContent: safeContent,
   });
+
   useEffect(() => {
     if (!editor || !onChange) return;
 
