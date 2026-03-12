@@ -16,51 +16,78 @@ import {
 } from "@/components/ui/sheet";
 import { Menu, SquareMenu } from "lucide-react";
 import { AnimatedThemeToggler } from "@/components/ui/animated-theme-toggler";
-import { useRouter } from "next/navigation"
+import { useRouter } from "next/navigation";
 
 const Navbar = () => {
-
-  const router = useRouter()
-
+  const router = useRouter();
 
   return (
     <nav className="container px-5 max-w-full fixed top-0 left-0 z-10 bg-white-300 backdrop-blur-2xl">
       <div className="flex container max-w-7xl items-center justify-between mx-auto px-5 py-3 ">
-          <img src="/images/collabhub-bw.png" className="sitelogo" onClick={()=>router.push("/")}/>
-      <div className="hidden md:flex">
-        <NavigationMenuDemo />
-      </div>
-      <div className="flex items-center gap-2 ">
-        <Button variant="outline" className="hidden md:block" onClick={()=>router.push("/login")}>
-          Login
-        </Button>
-        {/* <ModeToggle /> */}
-        <AnimatedThemeToggler/>
-        <div className="block md:hidden">
-          <Sheet>
-          <SheetTrigger>
-            <Menu />
-          </SheetTrigger>
-          <SheetContent>
-            <SheetHeader>
-              <SheetTitle>Quick Links</SheetTitle>
+        <img
+          src="/images/collabhub-bw.png"
+          className="sitelogo"
+          onClick={() => router.push("/")}
+        />
+        <div className="hidden md:flex">
+          <NavigationMenuDemo />
+        </div>
+        <div className="flex items-center gap-2 ">
+          <Button
+            variant="outline"
+            className="hidden md:block"
+            onClick={() => router.push("/login")}
+          >
+            Login
+          </Button>
+          {/* <ModeToggle /> */}
+          <AnimatedThemeToggler />
+          <div className="block md:hidden">
+            <Sheet>
+              <SheetTrigger>
+                <Menu />
+              </SheetTrigger>
+              <SheetContent>
+                <SheetHeader>
+                  <SheetTitle>Quick Links</SheetTitle>
 
-              <SheetDescription>
-                <ul className="flex flex-col gap-3">
-                   <li><Link href="/pricing">Pricing</Link></li>
-                   <li><Link href="/dashboard">Dashboard</Link></li>
-                   <li><Link href="/dashboard/account">Account</Link></li>
-                </ul>
-               
-                <Button variant="outline" onClick={()=>router.push("/login")} className="mt-4">Login</Button>
-              </SheetDescription>
-            </SheetHeader>
-          </SheetContent>
-        </Sheet>
+                  <SheetDescription>
+                    <ul className="flex flex-col gap-3">
+                      <li>
+                        <SheetClose asChild>
+                          <Link href="/pricing">Pricing</Link>
+                        </SheetClose>
+                      </li>
+
+                      <li>
+                        <SheetClose asChild>
+                          <Link href="/dashboard">Dashboard</Link>
+                        </SheetClose>
+                      </li>
+
+                      <li>
+                        <SheetClose asChild>
+                          <Link href="/dashboard/account">Account</Link>
+                        </SheetClose>
+                      </li>
+                    </ul>
+
+                    <SheetClose asChild>
+                      <Button
+                        variant="outline"
+                        onClick={() => router.push("/login")}
+                        className="mt-4"
+                      >
+                        Login
+                      </Button>
+                    </SheetClose>
+                  </SheetDescription>
+                </SheetHeader>
+              </SheetContent>
+            </Sheet>
+          </div>
         </div>
       </div>
-      </div>
-      
     </nav>
   );
 };
