@@ -33,7 +33,7 @@ import {
 import { WorkspaceCreateForm } from "@/components/WorkspaceCreateForm";
 import { useWorkspaceStore } from "@/store/workspaceStore"
 import { useRouter } from "next/navigation";
-import { AnimatedThemeToggler } from "./ui/animated-theme-toggler";
+import Link from "next/link";
 
 
 
@@ -123,7 +123,12 @@ const workspaceItems =
             </DialogContent>
           </Dialog>
         </div>
-
+          <Link
+    href="/dashboard/workspaces"
+    className="block w-full text-sm border rounded-md py-2 text-center hover:bg-muted transition"
+  >
+    View All Workspaces
+  </Link>
       </SidebarContent>
 
       <SidebarFooter>
