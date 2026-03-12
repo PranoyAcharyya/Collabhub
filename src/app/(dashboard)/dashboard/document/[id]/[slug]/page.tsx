@@ -20,8 +20,8 @@ export default function DocumentPage() {
   const id = params.id as string;
   const queryClient = useQueryClient();
 
-  const [content, setContent] = useState("");
-  const [originalContent, setOriginalContent] = useState("");
+  const [content, setContent] = useState("[]");
+  const [originalContent, setOriginalContent] = useState("[]");
   const [title, setTitle] = useState("");
   const [titleSaved, setTitleSaved] = useState(true);
 
@@ -31,13 +31,16 @@ export default function DocumentPage() {
     enabled: !!id,
   });
 
-  // 🔥 Initialize title + content from DB
+  // Initialize title + content from DB
   useEffect(() => {
     if (data?.document) {
       setTitle(data.document.title || "");
       setTitleSaved(true);
 
-      const dbContent = data.document.content || "";
+      const dbContent = data.document.content
+        ? JSON.stringify(data.document.content)
+        : "[]";
+
       setContent(dbContent);
       setOriginalContent(dbContent);
     }
@@ -49,7 +52,9 @@ export default function DocumentPage() {
       const res = await fetch(`/api/documents/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ content: newContent }),
+        body: JSON.stringify({
+          content: JSON.parse(newContent), // 🔥 convert back to JSON
+        }),
       });
 
       if (!res.ok) throw new Error("Failed to save content");
@@ -60,7 +65,7 @@ export default function DocumentPage() {
     },
   });
 
-  // 🔥 Autosave (2s debounce)
+  // Autosave (2s debounce)
   useEffect(() => {
     if (!content) return;
     if (content === originalContent) return;
@@ -107,7 +112,7 @@ export default function DocumentPage() {
 
   return (
     <div className="p-6 max-w-4xl mx-auto">
-      
+
       {/* TITLE */}
       <div className="flex items-center justify-between mb-4">
         <input
@@ -132,13 +137,11 @@ export default function DocumentPage() {
         {titleSaved ? "Title saved" : "Unsaved title changes"}
       </p>
 
-      {/* 🔥 Manual Save Button */}
+      {/* Manual Save Button */}
       <div className="flex justify-end mb-4">
         <Button
           size="sm"
-          disabled={
-            saveContent.isPending || content === originalContent
-          }
+          disabled={saveContent.isPending || content === originalContent}
           onClick={() => saveContent.mutate(content)}
         >
           {saveContent.isPending ? "Saving..." : "Save Content"}
