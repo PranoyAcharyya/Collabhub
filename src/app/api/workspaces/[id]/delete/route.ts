@@ -2,12 +2,12 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 
 export async function DELETE(
-  req: Request,
-  context: { params: Promise<{ id: string }> }
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const supabase = await createClient();
+  const { id: workspaceId } = await params;
 
-  const { id: workspaceId } = await context.params;
+  const supabase = await createClient();
 
   const {
     data: { user },
@@ -25,7 +25,10 @@ export async function DELETE(
     .single();
 
   if (!workspace) {
-    return NextResponse.json({ error: "Workspace not found" }, { status: 404 });
+    return NextResponse.json(
+      { error: "Workspace not found" },
+      { status: 404 }
+    );
   }
 
   // only owner can delete

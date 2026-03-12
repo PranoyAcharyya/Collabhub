@@ -4,8 +4,10 @@ import { cookies } from "next/headers";
 
 export async function DELETE(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
+
   const cookieStore = await cookies();
 
   const supabase = createServerClient(
@@ -36,7 +38,7 @@ export async function DELETE(
   const { error } = await supabase
     .from("workspace_members")
     .delete()
-    .eq("workspace_id", params.id)
+    .eq("workspace_id", id)
     .eq("user_id", user.id);
 
   if (error) {
