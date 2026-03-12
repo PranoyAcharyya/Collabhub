@@ -24,7 +24,7 @@ const Navbar = () => {
 
 
   return (
-    <nav className="container max-w-full fixed top-0 left-0 z-10 bg-white-300 backdrop-blur-2xl">
+    <nav className="container px-5 max-w-full fixed top-0 left-0 z-10 bg-white-300 backdrop-blur-2xl">
       <div className="flex container max-w-7xl items-center justify-between mx-auto px-5 py-3 ">
           <img src="/images/collabhub-bw.png" className="sitelogo" onClick={()=>router.push("/")}/>
       <div className="hidden md:flex">
@@ -44,7 +44,11 @@ const Navbar = () => {
           <SheetContent>
             <SheetHeader>
               <SheetTitle>Quick Links</SheetTitle>
+
               <SheetDescription>
+                <Link href="/pricing">Pricing</Link>
+                <Link href="/dashboard">Dashboard</Link>
+                <Link href="/dashboard/account">Account</Link>
                 <Button variant="outline" onClick={()=>router.push("/login")}>Login</Button>
               </SheetDescription>
             </SheetHeader>
