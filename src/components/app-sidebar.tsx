@@ -108,6 +108,7 @@ const workspaceItems =
                onClick={() => setOpen(true)}
               className="w-full text-sm border rounded-md py-2 hover:bg-muted transition">
                 + Create Workspace
+                <span className="hidden group-data-[collapsible=icon]:inline">+</span>
               </button>
             </DialogTrigger>
 
@@ -128,6 +129,9 @@ const workspaceItems =
     className="block w-full text-sm border rounded-md py-2 text-center hover:bg-muted transition"
   >
     View All Workspaces
+     <span className="hidden group-data-[collapsible=icon]:inline">
+    W
+  </span>
   </Link>
       </SidebarContent>
 
