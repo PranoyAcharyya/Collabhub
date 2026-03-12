@@ -46,9 +46,12 @@ const Navbar = () => {
               <SheetTitle>Quick Links</SheetTitle>
 
               <SheetDescription>
-                <Link href="/pricing">Pricing</Link>
-                <Link href="/dashboard">Dashboard</Link>
-                <Link href="/dashboard/account">Account</Link>
+                <ul className="flex flex-col gap-3">
+                   <li><Link href="/pricing">Pricing</Link></li>
+                   <li><Link href="/dashboard">Dashboard</Link></li>
+                   <li><Link href="/dashboard/account">Account</Link></li>
+                </ul>
+               
                 <Button variant="outline" onClick={()=>router.push("/login")}>Login</Button>
               </SheetDescription>
             </SheetHeader>
