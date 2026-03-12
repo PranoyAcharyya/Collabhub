@@ -16,10 +16,7 @@ export default function BlockEditorInternal({
 }: BlockEditorProps) {
 
 const editor = useCreateBlockNote({
-  initialContent:
-    initialContent && Array.isArray(initialContent)
-      ? initialContent
-      : undefined,
+  initialContent: initialContent ? JSON.parse(initialContent) : undefined,
 });
 
   useEffect(() => {
