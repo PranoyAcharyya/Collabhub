@@ -124,7 +124,7 @@ const secondRow = reviews.slice(reviews.length / 2)
      <section className="min-h-screen px-5 flex flex-col justify-center items-center gap-5 relative overflow-hidden">
 
     
-<Globe className="top-20" />
+<Globe className="top-20 hidden lg:block" />
 
   {/* Content */}
   <div className="relative flex flex-col items-center gap-5">
