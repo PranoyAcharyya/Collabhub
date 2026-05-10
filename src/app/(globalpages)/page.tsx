@@ -1,5 +1,5 @@
 "use client";
-import { useState } from 'react';
+import { useState } from "react";
 import { AnimatedShinyText } from "@/components/ui/animated-shiny-text";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -7,8 +7,7 @@ import { TextAnimate } from "@/components/ui/text-animate";
 import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ShineBorder } from "@/components/ui/shine-border";
-import { Globe } from "@/components/ui/globe"
-
+import { Globe } from "@/components/ui/globe";
 
 import {
   Users,
@@ -19,14 +18,16 @@ import {
   Zap,
 } from "lucide-react";
 
-import { ScrollVelocityRow,ScrollVelocityContainer } from "@/components/ui/scroll-based-velocity";
+import {
+  ScrollVelocityRow,
+  ScrollVelocityContainer,
+} from "@/components/ui/scroll-based-velocity";
 import { Marquee } from "@/components/ui/marquee";
 import ReviewCard from "@/components/ReviewCard";
-import { InteractiveHoverButton } from '@/components/ui/interactive-hover-button';
-
+import { InteractiveHoverButton } from "@/components/ui/interactive-hover-button";
 
 export default function Home() {
-    const [content, setContent] = useState();
+  const [content, setContent] = useState();
   const features = [
     {
       title: "Real-Time Collaboration",
@@ -66,113 +67,171 @@ export default function Home() {
     },
   ];
 
-const IMAGES_ROW_A = [
-  "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?q=80&w=2000&auto=format&fit=crop",
-  "https://images.unsplash.com/photo-1492724441997-5dc865305da7?q=80&w=2000&auto=format&fit=crop",
-  "https://images.unsplash.com/photo-1519389950473-47ba0277781c?q=80&w=2000&auto=format&fit=crop"
-];
-const IMAGES_ROW_B = [
-  "https://images.unsplash.com/photo-1749738456487-2af715ab65ea?q=80&w=2340&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDF8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-  "https://plus.unsplash.com/premium_photo-1720139288219-e20aa9c8895b?q=80&w=1810&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-]
+  const IMAGES_ROW_A = [
+    "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?q=80&w=2000&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1492724441997-5dc865305da7?q=80&w=2000&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1519389950473-47ba0277781c?q=80&w=2000&auto=format&fit=crop",
+  ];
+  const IMAGES_ROW_B = [
+    "https://images.unsplash.com/photo-1749738456487-2af715ab65ea?q=80&w=2340&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDF8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    "https://plus.unsplash.com/premium_photo-1720139288219-e20aa9c8895b?q=80&w=1810&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+  ];
 
   const reviews = [
-  {
-    name: "Jack",
-    username: "@jack",
-    body: "I've never seen anything like this before. It's amazing. I love it.",
-    img: "https://avatar.vercel.sh/jack",
-  },
-  {
-    name: "Jill",
-    username: "@jill",
-    body: "I don't know what to say. I'm speechless. This is amazing.",
-    img: "https://avatar.vercel.sh/jill",
-  },
-  {
-    name: "John",
-    username: "@john",
-    body: "I'm at a loss for words. This is amazing. I love it.",
-    img: "https://avatar.vercel.sh/john",
-  },
-  {
-    name: "Jane",
-    username: "@jane",
-    body: "I'm at a loss for words. This is amazing. I love it.",
-    img: "https://avatar.vercel.sh/jane",
-  },
-  {
-    name: "Jenny",
-    username: "@jenny",
-    body: "I'm at a loss for words. This is amazing. I love it.",
-    img: "https://avatar.vercel.sh/jenny",
-  },
-  {
-    name: "James",
-    username: "@james",
-    body: "I'm at a loss for words. This is amazing. I love it.",
-    img: "https://avatar.vercel.sh/james",
-  },
-]
+    {
+      name: "Jack",
+      username: "@jack",
+      body: "I've never seen anything like this before. It's amazing. I love it.",
+      img: "https://avatar.vercel.sh/jack",
+    },
+    {
+      name: "Jill",
+      username: "@jill",
+      body: "I don't know what to say. I'm speechless. This is amazing.",
+      img: "https://avatar.vercel.sh/jill",
+    },
+    {
+      name: "John",
+      username: "@john",
+      body: "I'm at a loss for words. This is amazing. I love it.",
+      img: "https://avatar.vercel.sh/john",
+    },
+    {
+      name: "Jane",
+      username: "@jane",
+      body: "I'm at a loss for words. This is amazing. I love it.",
+      img: "https://avatar.vercel.sh/jane",
+    },
+    {
+      name: "Jenny",
+      username: "@jenny",
+      body: "I'm at a loss for words. This is amazing. I love it.",
+      img: "https://avatar.vercel.sh/jenny",
+    },
+    {
+      name: "James",
+      username: "@james",
+      body: "I'm at a loss for words. This is amazing. I love it.",
+      img: "https://avatar.vercel.sh/james",
+    },
+  ];
 
-
-const firstRow = reviews.slice(0, reviews.length / 2)
-const secondRow = reviews.slice(reviews.length / 2)
+  const firstRow = reviews.slice(0, reviews.length / 2);
+  const secondRow = reviews.slice(reviews.length / 2);
 
   return (
     <>
-     <section className="min-h-screen px-5 flex flex-col justify-center items-center gap-5 relative overflow-hidden">
+      <section className="min-h-screen relative overflow-hidden">
+        {/* ================= DESKTOP ================= */}
+        <div className="hidden lg:flex px-5 min-h-screen flex-col justify-center items-center gap-5 relative">
+          <Globe className="top-20 absolute" />
 
-    
-<Globe className="top-20 hidden lg:block" />
+          <div className="relative flex flex-col items-center gap-5">
+            <div className="group rounded-full border border-black/5 bg-neutral-100 text-base transition-all hover:bg-neutral-200">
+              <AnimatedShinyText className="inline-flex items-center justify-center px-4 py-1">
+                <span className="capitalize text-black">
+                  ✨ your own workplace
+                </span>
+              </AnimatedShinyText>
+            </div>
 
-  {/* Content */}
-  <div className="relative flex flex-col items-center gap-5">
+            <TextAnimate
+              as="h1"
+              animation="blurInUp"
+              by="word"
+              once
+              className="
+          text-[75px]
+          leading-[1.05]
+          text-center
+          font-bold
+          max-w-[1000px]
+          dark:mix-blend-difference
+        "
+            >
+              Your team’s all-in-one workspace
+            </TextAnimate>
 
-    <div
-      className={cn(
-        "group rounded-full border border-black/5 bg-neutral-100 text-base transition-all hover:bg-neutral-200"
-      )}
-    >
-      <AnimatedShinyText className="inline-flex items-center justify-center px-4 py-1">
-        <span className="capitalize text-black">✨ your own workplace</span>
-      </AnimatedShinyText>
-    </div>
+            <TextAnimate
+              className="dark:mix-blend-difference text-center max-w-[650px]"
+              animation="blurInUp"
+              by="character"
+              once
+            >
+              Manage projects, collaborate in real-time, and keep everything in
+              one place.
+            </TextAnimate>
 
-   <TextAnimate
-  as="h1"
-  animation="blurInUp"
-  by="word"
-  once
-  className="
-    text-2xl 
-    md:text-5xl 
-    lg:text-[75px] 
-    leading-[1.05] 
-    text-center 
-    font-bold 
-    max-w-[80%] 
-    mx-auto
-   dark:mix-blend-difference
-  "
->
-  Your team’s all-in-one workspace
-</TextAnimate>
-       <TextAnimate className='dark:mix-blend-difference text-center' animation="blurInUp" by="character" once>
-      Manage projects, collaborate in real-time, and keep everything in one place.
-    </TextAnimate>
-    <motion.div
-      initial={{ opacity: 0, y: 40 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6, ease: "easeOut" }}
-    >
-      <Button className="px-14 py-7 text-xl mt-4">
-        Start building for free
-      </Button>
-    </motion.div>
+            <motion.div
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, ease: "easeOut" }}
+            >
+              <Button className="px-14 py-7 text-xl mt-4">
+                Start building for free
+              </Button>
+            </motion.div>
+          </div>
+        </div>
 
-  </div>
-</section>
+        {/* ================= MOBILE + TABLET ================= */}
+        <div className="flex lg:hidden min-h-screen px-5 py-24 flex-col justify-center items-center text-center relative overflow-hidden">
+          <div className="flex flex-col items-center gap-6 w-full max-w-md">
+            <div className="group rounded-full border border-black/5 bg-neutral-100 text-sm transition-all hover:bg-neutral-200">
+              <AnimatedShinyText className="inline-flex items-center justify-center px-3 py-1">
+                <span className="capitalize text-black">
+                  ✨ your own workplace
+                </span>
+              </AnimatedShinyText>
+            </div>
+
+            <TextAnimate
+              as="h1"
+              animation="blurInUp"
+              by="word"
+              once
+              className="
+          text-4xl
+          sm:text-5xl
+          font-bold
+          leading-tight
+          tracking-tight
+          dark:mix-blend-difference
+        "
+            >
+              Your team’s all-in-one workspace
+            </TextAnimate>
+
+            <TextAnimate
+              className="
+          text-sm
+          sm:text-base
+          text-neutral-600
+          dark:text-neutral-300
+          leading-relaxed
+          px-2
+        "
+              animation="blurInUp"
+              by="character"
+              once
+            >
+              Manage projects, collaborate in real-time, and keep everything in
+              one place.
+            </TextAnimate>
+
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className="w-full"
+            >
+              <Button className="w-full py-6 text-base rounded-2xl">
+                Start building for free
+              </Button>
+            </motion.div>
+          </div>
+        </div>
+      </section>
 
       <section className="min-h-screen px-5 py-16 container max-w-7xl mx-auto flex flex-col">
         <img
@@ -276,62 +335,66 @@ const secondRow = reviews.slice(reviews.length / 2)
       </section>
 
       <section>
-        <h2 className="text-4xl text-center font-bold capitalize mb-10">Brand We work with</h2>
-         <div className="relative flex w-full flex-col items-center justify-center overflow-hidden py-8">
-      <ScrollVelocityContainer className="w-full">
-        <ScrollVelocityRow baseVelocity={6} direction={1} className="py-4">
-          {IMAGES_ROW_A.map((src, idx) => (
-            <img
-              key={idx}
-              src={`${src}&ixlib=rb-4.0.3`}
-              alt="Unsplash sample"
-              width={240}
-              height={160}
-              loading="lazy"
-              decoding="async"
-              className="mx-4 inline-block h-40 w-60 rounded-lg object-cover shadow-sm"
-            />
-          ))}
-        </ScrollVelocityRow>
-        <ScrollVelocityRow baseVelocity={6} direction={-1} className="py-4">
-          {IMAGES_ROW_B.map((src, idx) => (
-            <img
-              key={idx}
-              src={`${src}&ixlib=rb-4.0.3`}
-              alt="Unsplash sample"
-              width={240}
-              height={160}
-              loading="lazy"
-              decoding="async"
-              className="mx-4 inline-block h-40 w-60 rounded-lg object-cover shadow-sm"
-            />
-          ))}
-        </ScrollVelocityRow>
-      </ScrollVelocityContainer>
-      <div className="from-background pointer-events-none absolute inset-y-0 left-0 w-1/4 bg-gradient-to-r"></div>
-      <div className="from-background pointer-events-none absolute inset-y-0 right-0 w-1/4 bg-gradient-to-l"></div>
-    </div>
+        <h2 className="text-4xl text-center font-bold capitalize mb-10">
+          Brand We work with
+        </h2>
+        <div className="relative flex w-full flex-col items-center justify-center overflow-hidden py-8">
+          <ScrollVelocityContainer className="w-full">
+            <ScrollVelocityRow baseVelocity={6} direction={1} className="py-4">
+              {IMAGES_ROW_A.map((src, idx) => (
+                <img
+                  key={idx}
+                  src={`${src}&ixlib=rb-4.0.3`}
+                  alt="Unsplash sample"
+                  width={240}
+                  height={160}
+                  loading="lazy"
+                  decoding="async"
+                  className="mx-4 inline-block h-40 w-60 rounded-lg object-cover shadow-sm"
+                />
+              ))}
+            </ScrollVelocityRow>
+            <ScrollVelocityRow baseVelocity={6} direction={-1} className="py-4">
+              {IMAGES_ROW_B.map((src, idx) => (
+                <img
+                  key={idx}
+                  src={`${src}&ixlib=rb-4.0.3`}
+                  alt="Unsplash sample"
+                  width={240}
+                  height={160}
+                  loading="lazy"
+                  decoding="async"
+                  className="mx-4 inline-block h-40 w-60 rounded-lg object-cover shadow-sm"
+                />
+              ))}
+            </ScrollVelocityRow>
+          </ScrollVelocityContainer>
+          <div className="from-background pointer-events-none absolute inset-y-0 left-0 w-1/4 bg-gradient-to-r"></div>
+          <div className="from-background pointer-events-none absolute inset-y-0 right-0 w-1/4 bg-gradient-to-l"></div>
+        </div>
       </section>
       <section>
-        <h2 className="text-4xl text-center font-bold capitalize mb-10">What people are saying</h2>
-          <div className="relative flex w-full flex-col items-center justify-center overflow-hidden">
-      <Marquee pauseOnHover className="[--duration:20s]">
-        {firstRow.map((review) => (
-          <ReviewCard key={review.username} {...review} />
-        ))}
-      </Marquee>
-      <Marquee reverse pauseOnHover className="[--duration:20s]">
-        {secondRow.map((review) => (
-          <ReviewCard key={review.username} {...review} />
-        ))}
-      </Marquee>
-      <div className="from-background pointer-events-none absolute inset-y-0 left-0 w-1/4 bg-gradient-to-r"></div>
-      <div className="from-background pointer-events-none absolute inset-y-0 right-0 w-1/4 bg-gradient-to-l"></div>
-    </div>
+        <h2 className="text-4xl text-center font-bold capitalize mb-10">
+          What people are saying
+        </h2>
+        <div className="relative flex w-full flex-col items-center justify-center overflow-hidden">
+          <Marquee pauseOnHover className="[--duration:20s]">
+            {firstRow.map((review) => (
+              <ReviewCard key={review.username} {...review} />
+            ))}
+          </Marquee>
+          <Marquee reverse pauseOnHover className="[--duration:20s]">
+            {secondRow.map((review) => (
+              <ReviewCard key={review.username} {...review} />
+            ))}
+          </Marquee>
+          <div className="from-background pointer-events-none absolute inset-y-0 left-0 w-1/4 bg-gradient-to-r"></div>
+          <div className="from-background pointer-events-none absolute inset-y-0 right-0 w-1/4 bg-gradient-to-l"></div>
+        </div>
       </section>
-     <section className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-28 lg:py-36">
-  <div
-    className=" cta 
+      <section className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-28 lg:py-36">
+        <div
+          className=" cta 
       min-h-[260px] sm:min-h-[300px] 
       flex flex-col items-center justify-center 
       text-center gap-4 sm:gap-6
@@ -342,22 +405,22 @@ const secondRow = reviews.slice(reviews.length / 2)
       bg-[position:0%_0%]
       dark:bg-[linear-gradient(135deg,_rgb(244,63,94),_rgba(251,113,133,0.8))]
     "
-  >
-    <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white leading-tight">
-      Try Collabhub free
-    </h2>
+        >
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white leading-tight">
+            Try Collabhub free
+          </h2>
 
-    <p className="text-base sm:text-lg lg:text-2xl text-white/90 max-w-2xl">
-      Start with a focused trial to explore the workspace
-    </p>
+          <p className="text-base sm:text-lg lg:text-2xl text-white/90 max-w-2xl">
+            Start with a focused trial to explore the workspace
+          </p>
 
-    <div className="mt-2 sm:mt-4">
-      <InteractiveHoverButton>
-        Hurry 14 days free trial
-      </InteractiveHoverButton>
-    </div>
-  </div>
-</section>
+          <div className="mt-2 sm:mt-4">
+            <InteractiveHoverButton>
+              Hurry 14 days free trial
+            </InteractiveHoverButton>
+          </div>
+        </div>
+      </section>
     </>
   );
 }
